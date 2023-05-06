@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "598025252096",
+    "project_id": "pku-online",
+    "storage_bucket": "pku-online.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598025252096:android:65c98a8e154f7e683a17e5",
+        "android_client_info": {
+          "package_name": "com.example.uidisign05"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "598025252096-6c1be47ti6oue4adnut6h6p2o2qdvl42.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTH-0TsiHPwwn-Mwlff1y5GKuOys5o5Vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "598025252096-6c1be47ti6oue4adnut6h6p2o2qdvl42.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
