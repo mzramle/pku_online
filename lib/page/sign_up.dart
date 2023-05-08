@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pku_online/controller/signup_controller.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/space.dart';
 import 'package:pku_online/core/text_style.dart';
+import 'package:pku_online/page/home_page.dart';
 import 'package:pku_online/widget/main_button.dart';
 import 'package:pku_online/widget/text_field.dart';
 
@@ -75,12 +77,11 @@ class _SignUpPageState extends State<SignUpPage> {
               // ),
               SpaceVH(height: 30.0),
               Mainbutton(
-                onTap: () async {
-                  if (_formKey.currentState!.validate()) {
-                    SignUpController.instance.registerUser(
-                        controller.email.text.trim(),
-                        controller.password.text.trim());
-                  }
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()),
+                  );
                 },
                 text: 'Sign Up',
                 btnColor: blueButton,
