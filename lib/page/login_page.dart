@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/space.dart';
 import 'package:pku_online/core/text_style.dart';
+import 'package:pku_online/page/home_page.dart';
 import 'package:pku_online/page/sign_up.dart';
 import 'package:pku_online/widget/main_button.dart';
 import 'package:pku_online/widget/text_field.dart';
@@ -69,7 +70,12 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
                     Mainbutton(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
+                      },
                       text: 'Sign in',
                       btnColor: blueButton,
                     ),
