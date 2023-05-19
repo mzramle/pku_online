@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           FocusManager.instance.primaryFocus?.unfocus();
         }
       },
-      child: MaterialApp(
+      child: GetMaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: Styles.themeData(),

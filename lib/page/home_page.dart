@@ -8,6 +8,7 @@ import 'package:pku_online/core/light_color.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/core/theme.dart';
+import 'package:pku_online/page/user_setting.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -39,17 +40,23 @@ class _HomePageState extends State<HomePage> {
           size: 30,
           color: grayText,
         ),
-        ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(13)),
-          child: Container(
-            // height: 40,
-            // width: 40,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => UserSetting()));
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(13)),
+            child: Container(
+              // height: 40,
+              // width: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
+              ),
+              child: Image.asset("assets/image/user.png", fit: BoxFit.fill),
             ),
-            child: Image.asset("assets/image/user.png", fit: BoxFit.fill),
-          ),
-        ).p(8),
+          ).p(8),
+        ),
       ],
     );
   }
