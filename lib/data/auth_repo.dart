@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:pku_online/data/auth_error.dart';
-import 'package:pku_online/page/login_page.dart';
-import 'package:pku_online/page/splash_Page.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/data/auth_error.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/login_page.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/splash_Page.dart';
 
 class AuthenticationRepository extends GetxController {
   static AuthenticationRepository get instance => Get.find();

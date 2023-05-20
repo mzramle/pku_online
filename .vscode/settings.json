@@ -1,4 +1,3 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "cmake.configureOnOpen": true
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

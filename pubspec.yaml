@@ -1,4 +1,4 @@
-name: pku_online
+name: MAP-02-G007-PKUOnline-Flutter-App
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -29,7 +29,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.5
-  intl: ^0.17.0
+  intl: ^0.18.1
   animations: ^2.0.1
 
   # Firebase
@@ -37,6 +37,13 @@ dependencies:
   cloud_firestore: ^4.6.0
   get: ^4.6.5
   firebase_auth: ^4.2.2
+
+  google_nav_bar: ^5.0.6
+  flutter_map: ^4.0.0
+  latlong2: ^0.8.1
+
+  table_calendar: ^3.0.9
+  font_awesome_flutter: ^10.4.0
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +64,7 @@ flutter:
   assets:
     - assets/image/
     - assets/icon/
+    - assets/
 
   fonts:
     - family: SF Pro

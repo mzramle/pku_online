@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pku_online/core/colors.dart';
-import 'package:pku_online/core/space.dart';
-import 'package:pku_online/core/text_style.dart';
-import 'package:pku_online/data/demo.dart';
-import 'package:pku_online/page/login_page.dart';
-import 'package:pku_online/widget/main_button.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/space.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/text_style.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/data/demo.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/login_page.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/widget/main_button.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);

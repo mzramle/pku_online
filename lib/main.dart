@@ -1,35 +1,21 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pku_online/core/style.dart';
-import 'package:pku_online/data/auth_repo.dart';
-import 'package:pku_online/firebase_options.dart';
-import 'package:pku_online/page/splash_Page.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/routes/router.dart';
+import 'package:MAP-02-G007-PKUOnline-Flutter-App/utils/textscale.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
-      .then((value) => Get.put(AuthenticationRepository()));
-  runApp(MyApp());
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus &&
-            currentFocus.focusedChild != null) {
-          FocusManager.instance.primaryFocus?.unfocus();
-        }
-      },
-      child: GetMaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: Styles.themeData(),
-        home: HomePage(),
-      ),
+    return MaterialApp(
+      builder: fixTextScale,
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: routes,
     );
   }
 }
