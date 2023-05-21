@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/bmi_page.dart';
+import 'package:pku_online/page/chat_page.dart';
+import 'package:pku_online/page/ecomm_page.dart';
+import 'package:pku_online/page/medical_prescription_page.dart';
 import 'package:pku_online/page/user_profile.dart';
 
 List<Map> doctors = [
@@ -282,9 +285,9 @@ class AppointmentCard extends StatelessWidget {
 
 List<Map> categories = [
   {'icon': Icons.calculate_rounded, 'text': 'BMI'},
-  {'icon': Icons.local_hospital, 'text': 'Hospital'},
-  {'icon': Icons.car_rental, 'text': 'Ambulance'},
-  {'icon': Icons.local_pharmacy, 'text': 'Pill'},
+  {'icon': Icons.local_pharmacy, 'text': 'Medicine'},
+  {'icon': Icons.shopping_bag_rounded, 'text': 'Shop'},
+  {'icon': Icons.mark_unread_chat_alt_rounded, 'text': 'Chat'},
 ];
 
 class CategoryIcons extends StatelessWidget {
@@ -375,15 +378,26 @@ class CategoryIcon extends StatelessWidget {
         context,
         MaterialPageRoute(builder: (context) => BMIPage()),
       );
+    } else if (text == 'Medicine') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MedicinePage()),
+      );
+    } else if (text == 'Shop') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ShopPage()),
+      );
+    } else if (text == 'Chat') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ChatPage()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (text != 'BMI') {
-      return SizedBox(); // Return an empty widget for non-BMI categories
-    }
-
     return InkWell(
       splashColor: blueButton,
       onTap: () => navigateToPage(context),

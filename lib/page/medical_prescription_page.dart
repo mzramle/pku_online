@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pku_online/controller/medical_prescription_controller.dart';
+import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/models/medical_prescription_model.dart';
 
-class MedicalPrescriptionPage extends StatefulWidget {
+class MedicinePage extends StatefulWidget {
   @override
-  _MedicalPrescriptionPageState createState() =>
-      _MedicalPrescriptionPageState();
+  _MedicinePageState createState() => _MedicinePageState();
 }
 
-class _MedicalPrescriptionPageState extends State<MedicalPrescriptionPage> {
+class _MedicinePageState extends State<MedicinePage> {
   MedicalPrescriptionController _medicalPrescriptionController =
       MedicalPrescriptionController();
   List<MedicalPrescriptionModel> _medicalPrescriptionModel = [];
@@ -129,8 +129,8 @@ class _MedicalPrescriptionPageState extends State<MedicalPrescriptionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
-        title: Text('Medical Prescriptions'),
+        backgroundColor: blueButton,
+        title: Text('Medicine Reminder'),
       ),
       body: ListView.builder(
         itemCount: _medicalPrescriptionModel.length,
@@ -151,7 +151,8 @@ class _MedicalPrescriptionPageState extends State<MedicalPrescriptionPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        backgroundColor: blueButton,
+        child: Icon(Icons.add, color: white),
         onPressed: _addNewMedicalPrescription,
       ),
     );

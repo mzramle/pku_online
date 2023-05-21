@@ -91,43 +91,6 @@ class UserProfile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ListTile(
-                  leading: Icon(Icons.calendar_today, color: Colors.black),
-                  title: Text(
-                    'Appointment',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  onTap: () {
-                    // Add appointment logic
-                  },
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ListTile(
-                  leading: Icon(Icons.medication_rounded, color: Colors.black),
-                  title: Text(
-                    'Medical Prescription',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MedicalPrescriptionPage()));
-                  },
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ListTile(
                   leading: Icon(Icons.payment_sharp, color: Colors.black),
                   title: Text(
                     'Payment Details',
