@@ -488,15 +488,15 @@ class UserIntro extends StatelessWidget {
           ],
         ),
         GestureDetector(
+          child: const CircleAvatar(
+            backgroundImage: AssetImage('assets/person.jpeg'),
+          ),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => UserProfile()),
             );
           },
-          child: const CircleAvatar(
-            backgroundImage: AssetImage('assets/person.jpeg'),
-          ),
         )
       ],
     );
