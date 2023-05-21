@@ -496,7 +496,7 @@ class UserIntro extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             Text(
-              'Azzam 👋',
+              'Mary Jane 👋',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ],
