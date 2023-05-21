@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/page/account_settings_page.dart';
-import 'package:pku_online/page/medical_prescription_page.dart';
 import 'user_paymentdetails_page.dart';
 
 class UserProfile extends StatelessWidget {

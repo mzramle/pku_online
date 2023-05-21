@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:pku_online/models/chat_model.dart';
 
 class ChatController {

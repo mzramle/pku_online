@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/tabs/HomeTab.dart';
+import 'package:pku_online/tabs/ReportTab.dart';
 import 'package:pku_online/tabs/ScheduleTab.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 List<Map> navigationBarItems = [
   {'icon': Icons.local_hospital, 'index': 0},
   {'icon': Icons.calendar_today, 'index': 1},
+  {'icon': Icons.report, 'index': 2}
 ];
 
 class _HomePageState extends State<HomePage> {
@@ -30,6 +32,7 @@ class _HomePageState extends State<HomePage> {
         onPressedScheduleCard: goToSchedule,
       ),
       ScheduleTab(),
+      ReportTab(),
     ];
 
     return Scaffold(
