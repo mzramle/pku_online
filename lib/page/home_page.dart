@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/tabs/HomeTab.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/tabs/ScheduleTab.dart';
+import 'package:pku_online/core/colors.dart';
+import 'package:pku_online/tabs/HomeTab.dart';
+import 'package:pku_online/tabs/ScheduleTab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

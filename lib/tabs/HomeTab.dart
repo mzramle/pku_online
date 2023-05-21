@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/text_style.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/bmi_page.dart';
+import 'package:pku_online/core/colors.dart';
+import 'package:pku_online/core/text_style.dart';
+import 'package:pku_online/page/bmi_page.dart';
 
 List<Map> doctors = [
   {

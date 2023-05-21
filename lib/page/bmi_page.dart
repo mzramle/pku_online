@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/Icon_Content.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/Reusable_Bg.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/RoundIcon_Button.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/data/constants.dart';
+import 'package:pku_online/core/Icon_Content.dart';
+import 'package:pku_online/core/Reusable_Bg.dart';
+import 'package:pku_online/core/RoundIcon_Button.dart';
+import 'package:pku_online/core/colors.dart';
+import 'package:pku_online/data/constants.dart';
 import 'Results_Page.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/BottomContainer_Button.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/calculator.dart';
+import 'package:pku_online/core/BottomContainer_Button.dart';
+import 'package:pku_online/core/calculator.dart';
 
 // ignore: must_be_immutable
 class BMIPage extends StatefulWidget {

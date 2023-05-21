@@ -1,13 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/controller/signup_controller.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/space.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/text_style.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/home_page.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/widget/main_button.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/widget/text_field.dart';
+import 'package:pku_online/controller/signup_controller.dart';
+import 'package:pku_online/core/colors.dart';
+import 'package:pku_online/core/space.dart';
+import 'package:pku_online/core/text_style.dart';
+import 'package:pku_online/page/home_page.dart';
+import 'package:pku_online/widget/main_button.dart';
+import 'package:pku_online/widget/text_field.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);

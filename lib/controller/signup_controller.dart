@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/data/auth_repo.dart';
+import 'package:pku_online/data/auth_repo.dart';
 
 class SignUpController extends GetxController {
   static SignUpController get instance => Get.find();

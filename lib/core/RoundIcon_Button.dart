@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
+import 'package:pku_online/core/colors.dart';
 
 class RoundIconButton extends StatelessWidget {
   final IconData icon;

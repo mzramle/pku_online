@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
+import 'package:pku_online/core/colors.dart';
 import "package:latlong2/latlong.dart" as latLng;
 import 'package:table_calendar/table_calendar.dart';
 

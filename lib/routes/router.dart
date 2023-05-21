@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/doctor_detail.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/page/splash_page.dart';
+import 'package:pku_online/page/doctor_detail.dart';
+import 'package:pku_online/page/splash_page.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
   '/': (context) => HomePage(),

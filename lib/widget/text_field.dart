@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/colors.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/core/text_style.dart';
+import 'package:pku_online/core/colors.dart';
+import 'package:pku_online/core/text_style.dart';
 
 Widget textField({
   required String hintTxt,

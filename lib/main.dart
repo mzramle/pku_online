@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/routes/router.dart';
-import 'package:MAP-02-G007-PKUOnline-Flutter-App/utils/textscale.dart';
+import 'package:pku_online/routes/router.dart';
+import 'package:pku_online/utils/textscale.dart';
 
 void main() {
   runApp(const MyApp());
