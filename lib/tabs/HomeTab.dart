@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/bmi_page.dart';
+import 'package:pku_online/page/user_profile.dart';
 
 List<Map> doctors = [
   {
@@ -486,8 +487,16 @@ class UserIntro extends StatelessWidget {
             ),
           ],
         ),
-        const CircleAvatar(
-          backgroundImage: AssetImage('assets/person.jpeg'),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UserProfile()),
+            );
+          },
+          child: const CircleAvatar(
+            backgroundImage: AssetImage('assets/person.jpeg'),
+          ),
         )
       ],
     );

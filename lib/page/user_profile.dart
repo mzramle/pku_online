@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pku_online/page/account_settings_page.dart';
+import 'package:pku_online/page/medical_prescription_page.dart';
+import 'user_paymentdetails_page.dart';
 
 class UserProfile extends StatelessWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -39,11 +42,11 @@ class UserProfile extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 60,
-                child: Image.asset("assets/image/user.png"),
+                backgroundImage: AssetImage('assets/person.jpeg'),
               ),
               SizedBox(height: 10),
               Text(
-                'John Doe',
+                'Mary Jane',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -71,7 +74,12 @@ class UserProfile extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    // Add account settings logic
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AccountSettingsPage(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -105,7 +113,10 @@ class UserProfile extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    // Add medical prescription logic
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MedicalPrescriptionPage()));
                   },
                 ),
               ),
@@ -118,11 +129,14 @@ class UserProfile extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(Icons.payment_sharp, color: Colors.black),
                   title: Text(
-                    'Payment Settings',
+                    'Payment Details',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    // Add payment settings logic
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UserPaymentDetailsPage()));
                   },
                 ),
               ),
