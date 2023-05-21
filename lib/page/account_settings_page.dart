@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pku_online/core/colors.dart';
 import '../controller/account_settings_controller.dart';
 
 class AccountSettingsPage extends StatefulWidget {
@@ -37,7 +38,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        backgroundColor: blueButton,
         title: Text('Account Settings'),
       ),
       body: SingleChildScrollView(
@@ -69,11 +70,16 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 labelText: 'Password',
               ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 24.0),
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Color.fromARGB(255, 137, 18, 9)),
+                backgroundColor: MaterialStateProperty.all<Color>(blueButton),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        10.0), // Adjust the radius as needed
+                  ),
+                ),
               ),
               onPressed: () {
                 widget.accountSettingsController

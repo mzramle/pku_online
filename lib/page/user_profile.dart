@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/page/account_settings_page.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
 import 'user_paymentdetails_page.dart';
@@ -9,9 +10,9 @@ class UserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 137, 18, 9),
+      backgroundColor: blueButton,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: blueButton,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
