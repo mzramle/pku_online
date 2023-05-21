@@ -4,21 +4,24 @@ class MedicalPrescriptionController {
   List<MedicalPrescriptionModel> _medicalPrescriptions = [
     MedicalPrescriptionModel(
       id: '1',
-      medicineName: 'Medicine 1',
-      dosage: '2 tablets',
-      instructions: 'Take with water',
+      medicineName: 'Panadol',
+      dosage: '500mg',
+      instructions:
+          'Take 2 tablets orally every 4-6 hours as needed. Do not exceed 8 tablets in 24 hours.',
     ),
     MedicalPrescriptionModel(
       id: '2',
-      medicineName: 'Medicine 2',
-      dosage: '1 capsule',
-      instructions: 'Take after meal',
+      medicineName: 'Antibiotics',
+      dosage: '250mg',
+      instructions:
+          'Take 1 capsule orally twice daily after meals for 7-10 days. Follow the full course of treatment.',
     ),
     MedicalPrescriptionModel(
       id: '3',
-      medicineName: 'Medicine 3',
-      dosage: '3 times a day',
-      instructions: 'Take with food',
+      medicineName: 'Ibuprofen',
+      dosage: '200mg',
+      instructions:
+          'Take 1-2 tablets orally every 6-8 hours as needed for pain or fever. Do not exceed 6 tablets in 24 hours. Take with food or milk to reduce stomach upset.',
     ),
   ];
 

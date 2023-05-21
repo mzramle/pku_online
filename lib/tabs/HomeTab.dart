@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pku_online/controller/chat_controller.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/bmi_page.dart';
@@ -6,6 +7,7 @@ import 'package:pku_online/page/chat_page.dart';
 import 'package:pku_online/page/ecomm_page.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
 import 'package:pku_online/page/user_profile.dart';
+import 'package:uuid/uuid.dart';
 
 List<Map> doctors = [
   {
@@ -389,9 +391,15 @@ class CategoryIcon extends StatelessWidget {
         MaterialPageRoute(builder: (context) => ShopPage()),
       );
     } else if (text == 'Chat') {
+      final ChatController chatController = ChatController();
+      final String receiverId =
+          Uuid().v4(); // Replace with the actual receiver ID
+
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ChatPage()),
+        MaterialPageRoute(
+            builder: (context) => ChatPage(
+                chatController: chatController, receiverId: receiverId)),
       );
     }
   }

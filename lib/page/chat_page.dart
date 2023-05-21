@@ -1,253 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pku_online/core/Icon_Content.dart';
-import 'package:pku_online/core/Reusable_Bg.dart';
-import 'package:pku_online/core/RoundIcon_Button.dart';
-import 'package:pku_online/core/colors.dart';
-import 'package:pku_online/data/constants.dart';
-import 'Results_Page.dart';
-import 'package:pku_online/core/BottomContainer_Button.dart';
-import 'package:pku_online/core/calculator.dart';
+import 'package:pku_online/controller/chat_controller.dart';
+import 'package:pku_online/models/chat_model.dart';
+import 'package:uuid/uuid.dart';
 
-// ignore: must_be_immutable
 class ChatPage extends StatefulWidget {
+  final ChatController chatController;
+  final String receiverId;
+
+  ChatPage({required this.chatController, required this.receiverId});
+
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
-//ENUMERATION : The action of establishing number of something , implicit way
-enum Gender {
-  male,
-  female,
-}
-
 class _ChatPageState extends State<ChatPage> {
-  //by default male will be selected
+  TextEditingController _messageController = TextEditingController();
 
-  late Gender selectedGender = Gender.male;
-  int height = 180;
-  int weight = 50;
-  int age = 20;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('BMI Calculator'),
-        backgroundColor: blueButton,
+        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        title: Text('Chat'),
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedGender = Gender.male;
-                      });
-                    },
-                    child: ReusableBg(
-                      colour:
-                          selectedGender == Gender.male ? blueButton : grayText,
-                      cardChild: IconContent(
-                        myicon: FontAwesomeIcons.mars,
-                        text: 'MALE',
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedGender = Gender.female;
-                      });
-                    },
-                    child: ReusableBg(
-                      colour: selectedGender == Gender.female
-                          ? blueButton
-                          : grayText,
-                      cardChild: IconContent(
-                        myicon: FontAwesomeIcons.venus,
-                        text: 'FEMALE',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ReusableBg(
-              colour: blueButton,
-              cardChild: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'HEIGHT',
-                    style: klabelTextStyle.copyWith(color: white),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        height.toString(),
-                        style: kDigitTextStyle.copyWith(color: white),
-                      ),
-                      Text(
-                        'cm',
-                        style: klabelTextStyle.copyWith(color: white),
-                      ),
-                    ],
-                  ),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Color(MyColors.grey02),
-                      thumbColor: Color(MyColors.bg01),
-                      overlayColor: Color(0x29EB1555),
-                      thumbShape:
-                          RoundSliderThumbShape(enabledThumbRadius: 15.0),
-                      overlayShape:
-                          RoundSliderOverlayShape(overlayRadius: 35.0),
-                    ),
-                    child: Slider(
-                      value: height.toDouble(),
-                      min: 120,
-                      max: 220,
-                      onChanged: (double newValue) {
-                        setState(() {
-                          height = newValue.round();
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: ReusableBg(
-                    colour: blueButton,
-                    cardChild: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'WEIGHT',
-                          style: klabelTextStyle.copyWith(color: white),
-                        ),
-                        Text(
-                          weight.toString(),
-                          style: kDigitTextStyle.copyWith(color: white),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            RoundIconButton(
-                              icon: FontAwesomeIcons.minus,
-                              onPressed: () {
-                                setState(() {
-                                  weight--;
-                                });
-                              },
-                            ),
-                            SizedBox(
-                              width: 15.0,
-                            ),
-                            RoundIconButton(
-                              icon: FontAwesomeIcons.plus,
-                              onPressed: () {
-                                setState(() {
-                                  weight++;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ReusableBg(
-                    colour: blueButton,
-                    cardChild: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'AGE',
-                          style: klabelTextStyle.copyWith(color: white),
-                        ),
-                        Text(
-                          age.toString(),
-                          style: kDigitTextStyle.copyWith(color: white),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            RoundIconButton(
-                              icon: FontAwesomeIcons.minus,
-                              onPressed: () {
-                                setState(() {
-                                  age--;
-                                });
-                              },
-                            ),
-                            SizedBox(width: 15.0),
-                            RoundIconButton(
-                              icon: FontAwesomeIcons.plus,
-                              onPressed: () {
-                                setState(() {
-                                  age++;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          BottomContainer(
-            text: 'Calculate',
-            onTap: () {
-              Calculate calc = Calculate(height: height, weight: weight);
+            child: ListView.builder(
+              itemCount: widget.chatController
+                  .getChatsForReceiver(widget.receiverId)
+                  .length,
+              itemBuilder: (context, index) {
+                ChatModel chat = widget.chatController
+                    .getChatsForReceiver(widget.receiverId)[index];
+                bool isSender = chat.senderId == widget.receiverId;
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResultPage(
-                    bmi: calc.result(),
-                    resultText: calc.getText(),
-                    advise: calc.getAdvise(),
-                    textColor: calc.getTextColor(),
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  alignment:
+                      isSender ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSender ? Colors.blue : Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      chat.message,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: 'Type a message',
+                    ),
                   ),
                 ),
-              );
-            },
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    String message = _messageController.text.trim();
+                    if (message.isNotEmpty) {
+                      String senderID = Uuid().v4();
+                      widget.chatController.sendMessage(
+                        senderId: senderID,
+                        receiverId: widget.receiverId,
+                        message: message,
+                      );
+                      _messageController.clear();
+                      setState(() {});
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
-
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      //   child: Icon(
-      //     Icons.favorite,
-      //     color: Colors.pink,
-      //     size: 23.0,
-      //   ),
-      //   backgroundColor: kactiveCardColor,
-      // ),
     );
   }
 }
