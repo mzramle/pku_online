@@ -1,36 +1,23 @@
-import '../models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AccountSettingsController {
-  UserModel? currentUser;
+  final CollectionReference _userCollection =
+      FirebaseFirestore.instance.collection('User');
 
-  Future<void> getCurrentUser() async {
-    await Future.delayed(Duration(seconds: 2));
-    currentUser = UserModel(
-      id: '1',
-      fullName: 'Mary Jane',
-      email: 'maryjane@example.com',
-      phone: '+1234567890',
-      password: 'password123',
-    );
+  Future<Map<String, dynamic>?> fetchUserData(String currentUserId) async {
+    final DocumentSnapshot userSnapshot =
+        await _userCollection.doc(currentUserId).get();
+
+    if (userSnapshot.exists) {
+      final userData = userSnapshot.data() as Map<String, dynamic>;
+      return userData;
+    }
+
+    return null;
   }
 
-  Future<void> updateFullName(String newFullName) async {
-    await Future.delayed(Duration(seconds: 2));
-    currentUser?.fullName = newFullName;
-  }
-
-  Future<void> updateEmail(String newEmail) async {
-    await Future.delayed(Duration(seconds: 2));
-    currentUser?.email = newEmail;
-  }
-
-  Future<void> updatePhone(String newPhone) async {
-    await Future.delayed(Duration(seconds: 2));
-    currentUser?.phone = newPhone;
-  }
-
-  Future<void> updatePassword(String newPassword) async {
-    await Future.delayed(Duration(seconds: 2));
-    currentUser?.password = newPassword;
+  Future<void> updateUserData(
+      String currentUserId, Map<String, dynamic> updatedData) async {
+    await _userCollection.doc(currentUserId).update(updatedData);
   }
 }

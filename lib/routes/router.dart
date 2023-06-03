@@ -5,7 +5,7 @@ import 'package:pku_online/page/user_paymentdetails_page.dart';
 import 'package:pku_online/page/user_profile.dart'; // Import the UserProfile class
 
 Map<String, Widget Function(BuildContext)> routes = {
-  '/': (context) => HomePage(),
+  '/': (context) => SplashPage(),
   '/detail': (context) => SliverDoctorDetail(),
   '/paymentdetails': (BuildContext context) => UserPaymentDetailsPage(),
   '/userprofile': (BuildContext context) => UserProfile()

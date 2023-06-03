@@ -6,14 +6,14 @@ import 'package:pku_online/data/demo.dart';
 import 'package:pku_online/page/login_page.dart';
 import 'package:pku_online/widget/main_button.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+class SplashPage extends StatefulWidget {
+  const SplashPage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _SplashPageState createState() => _SplashPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;

@@ -24,7 +24,7 @@ class AuthenticationRepository extends GetxController {
   _setInitialScreen(User? user) {
     user == null
         ? Get.offAll(() => const LoginPage())
-        : Get.offAll(() => HomePage());
+        : Get.offAll(() => SplashPage());
   }
 
   //FUNC
@@ -35,7 +35,7 @@ class AuthenticationRepository extends GetxController {
           email: email, password: password);
       firebaseUser.value != null
           ? Get.offAll(() => const LoginPage())
-          : Get.to(() => HomePage());
+          : Get.to(() => SplashPage());
     } on FirebaseAuthException catch (e) {
       final ex = SignUpWithEmailAndPasswordFailure.code(e.code);
       return ex.message;

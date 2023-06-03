@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pku_online/controller/medical_prescription_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pku_online/core/colors.dart';
-import 'package:pku_online/models/medical_prescription_model.dart';
 
 class MedicinePage extends StatefulWidget {
   @override
@@ -9,28 +8,16 @@ class MedicinePage extends StatefulWidget {
 }
 
 class _MedicinePageState extends State<MedicinePage> {
-  MedicalPrescriptionController _medicalPrescriptionController =
-      MedicalPrescriptionController();
-  List<MedicalPrescriptionModel> _medicalPrescriptionModel = [];
+  final CollectionReference _medicalPrescriptionsRef =
+      FirebaseFirestore.instance.collection('medical_prescriptions');
 
   @override
   void initState() {
     super.initState();
-    _loadMedicalPrescription();
   }
 
-  void _loadMedicalPrescription() {
-    setState(() {
-      _medicalPrescriptionModel =
-          _medicalPrescriptionController.getMedicalPrescriptions();
-    });
-  }
-
-  void _deleteMedicalPrescription(String id) {
-    setState(() {
-      _medicalPrescriptionController.deleteMedicalPrescription(id);
-      _loadMedicalPrescription();
-    });
+  void _deleteMedicalPrescription(String id) async {
+    await _medicalPrescriptionsRef.doc(id).delete();
   }
 
   void _addNewMedicalPrescription() {
@@ -68,15 +55,13 @@ class _MedicinePageState extends State<MedicinePage> {
           actions: [
             TextButton(
               child: Text('Add'),
-              onPressed: () {
-                MedicalPrescriptionModel newMedicalPrescription =
-                    MedicalPrescriptionModel(
+              onPressed: () async {
+                await _addMedicalPrescription(
                   id: id,
                   medicineName: medicineName,
                   dosage: dosage,
                   instructions: instructions,
                 );
-                _addMedicalPrescription(newMedicalPrescription);
                 Navigator.of(context).pop();
               },
             ),
@@ -90,14 +75,22 @@ class _MedicinePageState extends State<MedicinePage> {
     );
   }
 
-  void _addMedicalPrescription(MedicalPrescriptionModel medicalPrescription) {
-    setState(() {
-      _medicalPrescriptionModel.add(medicalPrescription);
+  Future<void> _addMedicalPrescription({
+    required String id,
+    required String medicineName,
+    required String dosage,
+    required String instructions,
+  }) async {
+    await _medicalPrescriptionsRef.doc(id).set({
+      'id': id,
+      'medicineName': medicineName,
+      'dosage': dosage,
+      'instructions': instructions,
     });
   }
 
-  void _showMedicalPrescriptionModelDetails(
-      MedicalPrescriptionModel medicalPrescription) {
+  void _showMedicalPrescriptionDetails(
+      String medicineName, String dosage, String instructions) {
     showDialog(
       context: context,
       builder: (context) {
@@ -107,11 +100,11 @@ class _MedicinePageState extends State<MedicinePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Medicine Name: ${medicalPrescription.medicineName}'),
+              Text('Medicine Name: $medicineName'),
               SizedBox(height: 8),
-              Text('Dosage: ${medicalPrescription.dosage}'),
+              Text('Dosage: $dosage'),
               SizedBox(height: 8),
-              Text('Instructions: ${medicalPrescription.instructions}'),
+              Text('Instructions: $instructions'),
             ],
           ),
           actions: [
@@ -132,27 +125,44 @@ class _MedicinePageState extends State<MedicinePage> {
         backgroundColor: blueButton,
         title: Text('Medicine Reminder'),
       ),
-      body: ListView.builder(
-        itemCount: _medicalPrescriptionModel.length,
-        itemBuilder: (context, index) {
-          MedicalPrescriptionModel medicalPrescription =
-              _medicalPrescriptionModel[index];
-          return ListTile(
-            title: Text(medicalPrescription.medicineName),
-            subtitle: Text(medicalPrescription.dosage),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () =>
-                  _deleteMedicalPrescription(medicalPrescription.id),
-            ),
-            onTap: () =>
-                _showMedicalPrescriptionModelDetails(medicalPrescription),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _medicalPrescriptionsRef.snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == null) {
+            return CircularProgressIndicator();
+          }
+
+          List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: documents.length,
+            itemBuilder: (context, index) {
+              QueryDocumentSnapshot document = documents[index];
+              String id = document['id'] as String;
+              String medicineName = document['medicineName'] as String;
+              String dosage = document['dosage'] as String;
+              String instructions = document['instructions'] as String;
+
+              return ListTile(
+                title: Text(medicineName),
+                subtitle: Text(dosage),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () => _deleteMedicalPrescription(id),
+                ),
+                onTap: () => _showMedicalPrescriptionDetails(
+                  medicineName,
+                  dosage,
+                  instructions,
+                ),
+              );
+            },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: blueButton,
-        child: Icon(Icons.add, color: white),
+        child: Icon(Icons.add, color: Colors.white),
         onPressed: _addNewMedicalPrescription,
       ),
     );

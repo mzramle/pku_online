@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pku_online/controller/chat_controller.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/bmi_page.dart';
 import 'package:pku_online/page/chat_page.dart';
+import 'package:pku_online/page/doctor_detail.dart';
 import 'package:pku_online/page/ecomm_page.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
 import 'package:pku_online/page/user_profile.dart';
@@ -63,12 +66,28 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
+            Text(
+              'Appointment Today',
+              style: headline3,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            AppointmentCard(
+              onTap: onPressedScheduleCard,
+            ),
+            SizedBox(
+              height: 20,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Appointment Today',
-                  style: headline3,
+                  'Top Doctors',
+                  style: TextStyle(
+                    color: black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 TextButton(
                   child: Text(
@@ -81,22 +100,6 @@ class HomeTab extends StatelessWidget {
                   onPressed: () {},
                 )
               ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            AppointmentCard(
-              onTap: onPressedScheduleCard,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Top Doctor',
-              style: TextStyle(
-                color: black,
-                fontWeight: FontWeight.bold,
-              ),
             ),
             SizedBox(
               height: 20,
@@ -132,7 +135,10 @@ class TopDoctorCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 20),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/detail');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DetailBody()),
+          );
         },
         child: Padding(
           padding: EdgeInsets.all(10),
@@ -493,34 +499,55 @@ class UserIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Hello',
-              style: TextStyle(fontWeight: FontWeight.w500),
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    final String displayName = currentUser?.displayName ?? 'Guest';
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('User')
+          .doc(currentUser!.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return CircularProgressIndicator();
+        }
+
+        final data = snapshot.data!.data() as Map<String, dynamic>?;
+        final String? avatarUrl = data != null ? data['avatar'] : null;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  displayName,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ],
             ),
-            Text(
-              'Mary Jane 👋',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfile()),
+                );
+              },
+              child: CircleAvatar(
+                radius: 25,
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl)
+                    : AssetImage('assets/person.jpg') as ImageProvider<Object>?,
+              ),
             ),
           ],
-        ),
-        GestureDetector(
-          child: const CircleAvatar(
-            backgroundImage: AssetImage('assets/person.jpeg'),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => UserProfile()),
-            );
-          },
-        )
-      ],
+        );
+      },
     );
   }
 }
