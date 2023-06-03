@@ -92,6 +92,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       'password': _passwordTextController.text,
                       'email': _emailTextController.text,
                       'phone': _phoneTextController.text,
+                      'role': 'user',
                     }).then((value) {
                       print('Sign-up form data saved to Firestore');
                     }).catchError((error) {

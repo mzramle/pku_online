@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pku_online/controller/chat_controller.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
+import 'package:pku_online/page/admin_page.dart';
 import 'package:pku_online/page/bmi_page.dart';
 import 'package:pku_online/page/chat_page.dart';
 import 'package:pku_online/page/doctor_detail.dart';
@@ -137,7 +138,7 @@ class TopDoctorCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DetailBody()),
+            MaterialPageRoute(builder: (context) => SliverDoctorDetail()),
           );
         },
         child: Padding(
@@ -532,11 +533,27 @@ class UserIntro extends StatelessWidget {
               ],
             ),
             GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UserProfile()),
-                );
+              onTap: () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  final userDoc = FirebaseFirestore.instance
+                      .collection('User')
+                      .doc(user.uid);
+                  final userSnapshot = await userDoc.get();
+                  final userRole = userSnapshot.data()?['role'];
+
+                  if (userRole == 'admin') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AdminPage()),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => UserProfile()),
+                    );
+                  }
+                }
               },
               child: CircleAvatar(
                 radius: 25,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/controller/account_settings_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pku_online/page/change_password.dart';
 
 class AccountSettingsPage extends StatefulWidget {
   @override
@@ -52,11 +53,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     );
   }
 
+  void navigateToChangePassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: blueButton, // Set the background color to blueButton
+        backgroundColor: blueButton,
         title: Text('Account Settings'),
       ),
       body: Padding(
@@ -80,16 +88,28 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
             TextField(
               controller: passwordController,
+              obscureText: true,
+              enabled: false,
               decoration: InputDecoration(
                 labelText: 'Password',
-                hintText: 'Enter your password',
+                hintText: '********', // Placeholder for the obscured password
+              ),
+            ),
+            SizedBox(height: 8.0),
+            GestureDetector(
+              onTap: navigateToChangePassword,
+              child: Text(
+                'Change Password',
+                style: TextStyle(
+                  color: blueButton,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
             SizedBox(height: 24.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    blueButton, // Set the button color to blueButton
+                backgroundColor: blueButton,
               ),
               onPressed: updateUserData,
               child: Text(
