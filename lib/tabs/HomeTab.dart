@@ -7,6 +7,7 @@ import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/admin_page.dart';
 import 'package:pku_online/page/bmi_page.dart';
 import 'package:pku_online/page/chat_page.dart';
+import 'package:pku_online/page/doctorList_page.dart';
 import 'package:pku_online/page/doctor_detail.dart';
 import 'package:pku_online/page/ecomm_page.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
@@ -98,8 +99,13 @@ class HomeTab extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  onPressed: () {},
-                )
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DoctorList()),
+                    );
+                  },
+                ),
               ],
             ),
             SizedBox(
@@ -138,7 +144,10 @@ class TopDoctorCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SliverDoctorDetail()),
+            MaterialPageRoute(
+                builder: (context) => SliverDoctorDetail(
+                      doctor: {},
+                    )),
           );
         },
         child: Padding(
