@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 
@@ -11,65 +13,79 @@ class ScheduleTab extends StatefulWidget {
 
 enum FilterStatus { Upcoming, Complete, Cancel }
 
-List<Map> schedules = [
-  {
-    'img': 'assets/doctor01.jpeg',
-    'doctorName': 'Dr. Anastasya Syahid',
-    'doctorTitle': 'Dental Specialist',
-    'reservedDate': 'Monday, Aug 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Upcoming
-  },
-  {
-    'img': 'assets/doctor02.png',
-    'doctorName': 'Dr. Mauldya Imran',
-    'doctorTitle': 'Skin Specialist',
-    'reservedDate': 'Monday, Sep 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Upcoming
-  },
-  {
-    'img': 'assets/doctor03.jpeg',
-    'doctorName': 'Dr. Rihanna Garland',
-    'doctorTitle': 'General Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Upcoming
-  },
-  {
-    'img': 'assets/doctor04.jpeg',
-    'doctorName': 'Dr. John Doe',
-    'doctorTitle': 'Something Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Complete
-  },
-  {
-    'img': 'assets/doctor05.jpeg',
-    'doctorName': 'Dr. Sam Smithh',
-    'doctorTitle': 'Other Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Cancel
-  },
-  {
-    'img': 'assets/doctor05.jpeg',
-    'doctorName': 'Dr. Sam Smithh',
-    'doctorTitle': 'Other Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Cancel
-  },
-];
+class Booking {
+  final String id;
+  final DateTime dateTime;
+  final Doctor doctor;
+  final String status;
+  final String userUID;
+
+  Booking({
+    required this.id,
+    required this.dateTime,
+    required this.doctor,
+    required this.status,
+    required this.userUID,
+  });
+}
+
+class Doctor {
+  final String name;
+  final String title;
+  final String image;
+
+  Doctor({
+    required this.name,
+    required this.title,
+    required this.image,
+  });
+}
 
 class _ScheduleTabState extends State<ScheduleTab> {
   FilterStatus status = FilterStatus.Upcoming;
   Alignment _alignment = Alignment.centerLeft;
+  late List<Booking> bookings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch bookings from Firestore and initialize the `bookings` list
+    fetchBookings();
+  }
+
+  Future<void> fetchBookings() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('Booking').get();
+      final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
+        final data = doc.data();
+        final dateTime = (data['dateTime'] as Timestamp).toDate();
+        final doctorData = data['doctor'];
+        final doctor = Doctor(
+          name: doctorData['doctorName'],
+          title: doctorData['specialty'],
+          image: doctorData['imageUrl'],
+        );
+        return Booking(
+          id: doc.id,
+          dateTime: dateTime,
+          doctor: doctor,
+          status: data['status'],
+          userUID: data['userUID'],
+        );
+      }).toList();
+      setState(() {
+        bookings = fetchedBookings;
+      });
+    } catch (error) {
+      print('Error fetching bookings: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Map> filteredSchedules = schedules.where((var schedule) {
-      return schedule['status'] == status;
+    List<Booking> filteredBookings = bookings.where((booking) {
+      return booking.status == status.toString().split('.').last;
     }).toList();
 
     return Scaffold(
@@ -119,7 +135,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                             },
                             child: Center(
                               child: Text(
-                                filterStatus.name,
+                                filterStatus.toString().split('.').last,
                                 style: headline3,
                               ),
                             ),
@@ -140,7 +156,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                     ),
                     child: Center(
                       child: Text(
-                        status.name,
+                        status.toString().split('.').last,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -156,10 +172,10 @@ class _ScheduleTabState extends State<ScheduleTab> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: filteredSchedules.length,
+                itemCount: filteredBookings.length,
                 itemBuilder: (context, index) {
-                  var _schedule = filteredSchedules[index];
-                  bool isLastElement = filteredSchedules.length + 1 == index;
+                  var booking = filteredBookings[index];
+                  bool isLastElement = filteredBookings.length == index + 1;
                   return Card(
                     margin: !isLastElement
                         ? EdgeInsets.only(bottom: 20)
@@ -172,7 +188,8 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundImage: AssetImage(_schedule['img']),
+                                backgroundImage:
+                                    NetworkImage(booking.doctor.image),
                               ),
                               SizedBox(
                                 width: 10,
@@ -181,7 +198,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _schedule['doctorName'],
+                                    booking.doctor.name,
                                     style: TextStyle(
                                       color: Color(MyColors.header01),
                                       fontWeight: FontWeight.w700,
@@ -191,7 +208,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                     height: 5,
                                   ),
                                   Text(
-                                    _schedule['doctorTitle'],
+                                    booking.doctor.title,
                                     style: TextStyle(
                                       color: Color(MyColors.grey02),
                                       fontSize: 12,
@@ -205,56 +222,150 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           SizedBox(
                             height: 15,
                           ),
-                          DateTimeCard(),
+                          DateTimeCard(
+                            dateTime: booking.dateTime,
+                          ),
                           SizedBox(
                             height: 15,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  style: ButtonStyle(
-                                    foregroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            blueButton), // Text color
-                                    side: MaterialStateProperty.all<BorderSide>(
+                          if (booking.status == 'Upcoming')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    style: ButtonStyle(
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        blueButton,
+                                      ), // Text color
+                                      side:
+                                          MaterialStateProperty.all<BorderSide>(
                                         BorderSide(
-                                            color: blueButton)), // Border color
-                                    shape: MaterialStateProperty.all<
-                                            OutlinedBorder>(
+                                          color: blueButton,
+                                        ),
+                                      ), // Border color
+                                      shape: MaterialStateProperty.all<
+                                          OutlinedBorder>(
                                         RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                10))), // Button shape
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ), // Button shape
+                                    ),
+                                    child: Text(
+                                      booking.dateTime ==
+                                              DateTime.now().toLocal()
+                                          ? 'Chat'
+                                          : 'Cancel',
+                                    ),
+                                    onPressed: () {
+                                      if (booking.dateTime ==
+                                          DateTime.now().toLocal()) {
+                                        // Redirect to chat page
+                                        navigateToChatPage();
+                                      } else {
+                                        // Change booking status to 'Cancel'
+                                        cancelBooking(booking);
+                                      }
+                                    },
                                   ),
-                                  child: Text('Cancel'),
-                                  onPressed: () {},
                                 ),
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all<
-                                            Color>(
-                                        blueButton), // Button background color
-                                    foregroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Colors.white), // Text color
-                                    shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        blueButton,
+                                      ), // Button background color
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        Colors.white,
+                                      ), // Text color
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                10))), // Button shape
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ), // Button shape
+                                    ),
+                                    child: Text('Reschedule'),
+                                    onPressed: () {
+                                      // Redirect to doctor's detail page
+                                      navigateToDoctorDetail(booking.doctor);
+                                    },
                                   ),
-                                  child: Text('Reschedule'),
-                                  onPressed: () => {},
                                 ),
-                              )
-                            ],
-                          )
+                              ],
+                            ),
+                          if (booking.status == 'Complete')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        blueButton,
+                                      ), // Button background color
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        Colors.white,
+                                      ), // Text color
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ), // Button shape
+                                    ),
+                                    child: Text('Confirm and Pay'),
+                                    onPressed: () {
+                                      // Redirect to payment page
+                                      navigateToPaymentPage(booking);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (booking.status == 'Cancel')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        blueButton,
+                                      ), // Button background color
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        Colors.white,
+                                      ), // Text color
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ), // Button shape
+                                    ),
+                                    child: Text('Reschedule'),
+                                    onPressed: () {
+                                      // Redirect to chat page
+                                      navigateToChatPage();
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
@@ -267,11 +378,55 @@ class _ScheduleTabState extends State<ScheduleTab> {
       ),
     );
   }
+
+  void cancelBooking(Booking booking) {
+    try {
+      // Update booking status to 'Cancel' in Firestore
+      FirebaseFirestore.instance.collection('Booking').doc(booking.id).update({
+        'status': 'Cancel',
+      }).then((_) {
+        // Update the bookings list after successful Firestore update
+        setState(() {
+          bookings = bookings.map((b) {
+            if (b.id == booking.id) {
+              return Booking(
+                id: b.id,
+                dateTime: b.dateTime,
+                doctor: b.doctor,
+                status: 'Cancel',
+                userUID: b.userUID,
+              );
+            }
+            return b;
+          }).toList();
+        });
+      }).catchError((error) {
+        print('Error updating booking status: $error');
+      });
+    } catch (error) {
+      print('Error updating booking status: $error');
+    }
+  }
+
+  void navigateToDoctorDetail(Doctor doctor) {
+    // TODO: Navigate to the doctor's detail page and pass the doctor object
+  }
+
+  void navigateToPaymentPage(Booking booking) {
+    // TODO: Navigate to the payment page and pass the booking information along with the doctor object
+  }
+
+  void navigateToChatPage() {
+    // TODO: Navigate to the chat page
+  }
 }
 
 class DateTimeCard extends StatelessWidget {
+  final DateTime dateTime;
+
   const DateTimeCard({
     Key? key,
+    required this.dateTime,
   }) : super(key: key);
 
   @override
@@ -298,7 +453,7 @@ class DateTimeCard extends StatelessWidget {
                 width: 5,
               ),
               Text(
-                'Mon, July 29',
+                DateFormat('EEE, MMM d').format(dateTime),
                 style: TextStyle(
                   fontSize: 12,
                   color: blueButton,
@@ -318,7 +473,7 @@ class DateTimeCard extends StatelessWidget {
                 width: 5,
               ),
               Text(
-                '11:00 ~ 12:10',
+                DateFormat('HH:mm').format(dateTime),
                 style: TextStyle(
                   color: blueButton,
                   fontWeight: FontWeight.bold,

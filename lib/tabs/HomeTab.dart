@@ -7,6 +7,7 @@ import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/admin_page.dart';
 import 'package:pku_online/page/bmi_page.dart';
 import 'package:pku_online/page/chat_page.dart';
+import 'package:pku_online/page/chatlist_page.dart';
 import 'package:pku_online/page/doctorList_page.dart';
 import 'package:pku_online/page/doctor_detail.dart';
 import 'package:pku_online/page/ecomm_page.dart';
@@ -390,7 +391,7 @@ class CategoryIcon extends StatelessWidget {
     required this.text,
   });
 
-  void navigateToPage(BuildContext context) {
+  void navigateToPage(BuildContext context) async {
     if (text == 'BMI') {
       Navigator.push(
         context,
@@ -407,15 +408,35 @@ class CategoryIcon extends StatelessWidget {
         MaterialPageRoute(builder: (context) => ShopPage()),
       );
     } else if (text == 'Chat') {
-      final ChatController chatController = ChatController();
-      final String receiverId =
-          Uuid().v4(); // Replace with the actual receiver ID
+      final user = FirebaseAuth.instance.currentUser;
+      final userId = user?.uid;
+
+      if (userId == null) {
+        // Handle the case where the user is not authenticated
+        return;
+      }
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Booking')
+          .where('userUID', isEqualTo: userId)
+          .get();
+
+      final bookings = snapshot.docs;
+      final doctors = bookings.map((booking) {
+        final doctor = booking.data()['doctor'];
+        return doctor;
+      }).toList();
 
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ChatPage(
-                chatController: chatController, receiverId: receiverId)),
+          builder: (context) => ChatListScreen(
+            doctors: doctors,
+            onDoctorSelected: (doctor) {
+              // Handle doctor selection
+            },
+          ),
+        ),
       );
     }
   }

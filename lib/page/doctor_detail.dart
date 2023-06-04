@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:pku_online/core/colors.dart';
 import "package:latlong2/latlong.dart" as latLng;
 import 'package:table_calendar/table_calendar.dart';
@@ -97,7 +100,7 @@ class DetailBody extends StatelessWidget {
             ),
             child: Text('Book Appointment'),
             onPressed: () {
-              _showCalendarModal(context);
+              _showDateSelectionModal(context);
             },
           ),
         ],
@@ -105,125 +108,73 @@ class DetailBody extends StatelessWidget {
     );
   }
 
-  void _showCalendarModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        DateTime selectedDate = DateTime.now();
-
-        return Container(
-          padding: EdgeInsets.only(bottom: 16.0), // Add padding at the bottom
-          height: MediaQuery.of(context).size.height *
-              0.9, // Adjust the height as needed
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Select Date',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  // Add SingleChildScrollView here
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: CalendarWidget(
-                      onDateSelected: (DateTime date) {
-                        selectedDate = date;
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showTimeSelectionModal(context, selectedDate);
-                  },
-                  child: Text('Next'),
-                ),
-              ),
-            ],
-          ),
-        );
+  void _showDateSelectionModal(BuildContext context) {
+    DatePicker.showDatePicker(
+      context,
+      showTitleActions: true,
+      minTime: DateTime.now(),
+      maxTime: DateTime.now().add(Duration(days: 30)),
+      onConfirm: (date) {
+        _showTimeSelectionModal(context, date);
       },
     );
   }
 
   void _showTimeSelectionModal(BuildContext context, DateTime selectedDate) {
-    List<TimeOfDay> availableTimes = _getAvailableTimes();
-
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        TimeOfDay? selectedTime;
-
-        return Container(
-          height: 300,
-          child: Column(
-            children: [
-              Text(
-                'Select Time',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 20),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: availableTimes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  TimeOfDay time = availableTimes[index];
-                  return ListTile(
-                    title: Text(time.format(context)),
-                    onTap: () {
-                      selectedTime = time;
-                      Navigator.pop(context);
-                      _handleAppointmentBooking(selectedDate, selectedTime!);
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
+    DatePicker.showTimePicker(
+      context,
+      showTitleActions: true,
+      onConfirm: (time) {
+        DateTime selectedDateTime = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          time.hour,
+          time.minute,
         );
+        if (_isTimeWithinRange(selectedDateTime)) {
+          _handleAppointmentBooking(selectedDateTime);
+        } else {
+          _showTimeSelectionErrorSnackbar(context);
+        }
       },
     );
   }
 
-  List<TimeOfDay> _getAvailableTimes() {
-    List<TimeOfDay> availableTimes = [];
-    TimeOfDay startTime = TimeOfDay(hour: 9, minute: 0);
-    TimeOfDay endTime = TimeOfDay(hour: 17, minute: 0);
+  bool _isTimeWithinRange(DateTime dateTime) {
+    final TimeOfDay minTime = TimeOfDay(hour: 8, minute: 0);
+    final TimeOfDay maxTime = TimeOfDay(hour: 17, minute: 0);
+    final TimeOfDay selectedTime = TimeOfDay.fromDateTime(dateTime);
 
-    while (startTime != endTime) {
-      if (!(startTime.hour == 13 && startTime.minute == 0) &&
-          !(startTime.hour == 14 && startTime.minute == 0)) {
-        availableTimes.add(startTime);
-      }
-      startTime =
-          TimeOfDay(hour: startTime.hour, minute: startTime.minute + 30);
+    if (selectedTime.hour >= minTime.hour &&
+        selectedTime.hour <= maxTime.hour) {
+      return true;
+    } else {
+      return false;
     }
-
-    return availableTimes;
   }
 
-  void _handleAppointmentBooking(
-      DateTime selectedDate, TimeOfDay selectedTime) {
-    // Implement your logic to handle the appointment booking
-    // Use the selectedDate and selectedTime for further processing
-    // You can make API calls, update the database, etc.
-    // print('Selected Date: $selectedDate');
-    // print('Selected Time: ${selectedTime.format(context)}');
-    // Add your appointment booking logic here
+  void _showTimeSelectionErrorSnackbar(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text('Please select a time between 8 AM and 5 PM.'),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _handleAppointmentBooking(DateTime selectedDateTime) {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance.collection('Booking').add({
+        'dateTime': selectedDateTime,
+        'doctor': doctor,
+        'userUID': user.uid,
+        'status': 'Upcoming',
+      }).then((value) {
+        print('Booking saved to the database');
+      }).catchError((error) {
+        print('Failed to save booking: $error');
+      });
+    }
   }
 }
 
