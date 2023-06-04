@@ -5,7 +5,9 @@ import "package:latlong2/latlong.dart" as latLng;
 import 'package:table_calendar/table_calendar.dart';
 
 class SliverDoctorDetail extends StatelessWidget {
-  const SliverDoctorDetail({Key? key}) : super(key: key);
+  final Map<String, dynamic> doctor;
+
+  const SliverDoctorDetail({Key? key, required this.doctor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class SliverDoctorDetail extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: DetailBody(),
+            child: DetailBody(doctor: doctor),
           )
         ],
       ),
@@ -34,19 +36,23 @@ class SliverDoctorDetail extends StatelessWidget {
 }
 
 class DetailBody extends StatelessWidget {
-  const DetailBody({Key? key}) : super(key: key);
+  final Map<String, dynamic> doctor;
+
+  const DetailBody({Key? key, required this.doctor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final about = doctor['about'];
+
     return Container(
       padding: EdgeInsets.all(20),
       margin: EdgeInsets.only(bottom: 30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          DetailDoctorCard(),
+          DetailDoctorCard(doctor: doctor),
           SizedBox(height: 15),
-          DoctorInfo(),
+          DoctorInfo(doctor: doctor),
           SizedBox(height: 30),
           Text(
             'About Doctor',
@@ -58,7 +64,7 @@ class DetailBody extends StatelessWidget {
           ),
           SizedBox(height: 15),
           Text(
-            'Dr. Joshua Simorangkir is a specialist in internal medicine who specialized blah blah.',
+            about,
             style: TextStyle(
               color: grayText,
               fontWeight: FontWeight.w500,
@@ -303,22 +309,24 @@ class DoctorLocation extends StatelessWidget {
 }
 
 class DoctorInfo extends StatelessWidget {
-  const DoctorInfo({
-    Key? key,
-  }) : super(key: key);
+  final Map<String, dynamic> doctor;
+
+  const DoctorInfo({Key? key, required this.doctor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final patient = doctor['patient'];
+    final experience = doctor['experience'];
     return Row(
-      children: const [
+      children: [
         NumberCard(
           label: 'Patients',
-          value: '100+',
+          value: patient.toString(),
         ),
         SizedBox(width: 15),
         NumberCard(
           label: 'Experiences',
-          value: '10 years',
+          value: '$experience years',
         ),
         SizedBox(width: 15),
         NumberCard(
@@ -396,12 +404,15 @@ class NumberCard extends StatelessWidget {
 }
 
 class DetailDoctorCard extends StatelessWidget {
-  const DetailDoctorCard({
-    Key? key,
-  }) : super(key: key);
+  final Map<String, dynamic> doctor;
+
+  const DetailDoctorCard({Key? key, required this.doctor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final name = doctor['doctorName'];
+    final specialty = doctor['specialty'];
+    final imageUrl = doctor['imageUrl'];
     return Container(
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -416,7 +427,7 @@ class DetailDoctorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Dr. Josua Simorangkir',
+                      name,
                       style: TextStyle(
                           color: Color(MyColors.header01),
                           fontWeight: FontWeight.w700),
@@ -425,7 +436,7 @@ class DetailDoctorCard extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      'Heart Specialist',
+                      specialty,
                       style: TextStyle(
                         color: Color(MyColors.grey02),
                         fontWeight: FontWeight.w500,
@@ -434,10 +445,15 @@ class DetailDoctorCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Image(
-                image: AssetImage('assets/doctor01.jpeg'),
-                width: 100,
-              )
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  imageUrl,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ],
           ),
         ),
