@@ -24,6 +24,7 @@ class MedicineCard extends StatelessWidget {
                 child: Image.network(
                   medicine.imageUrl,
                   fit: BoxFit.cover,
+                  height: 200,
                 ),
               ),
               ListTile(

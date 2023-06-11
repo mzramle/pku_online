@@ -40,9 +40,11 @@ class MedicineController {
   }
 
   Future<void> updateMedicine(MedicalPrescriptionModel medicine) async {
-    CollectionReference medicineCollection =
-        FirebaseFirestore.instance.collection('medicineListShop');
-    await medicineCollection.doc(medicine.id).update(medicine.toMap());
+    try {
+      await _medicineCollection.doc(medicine.id).update(medicine.toMap());
+    } catch (e) {
+      print('Error updating medicine: $e');
+    }
   }
 
   Future<void> deleteMedicine(String id) async {

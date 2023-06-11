@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pku_online/models/medical_prescription_model.dart';
+import 'package:pku_online/page/update_medicine_page.dart';
 
 class MedicineDetailsPage extends StatelessWidget {
   final MedicalPrescriptionModel medicine;
@@ -14,6 +15,19 @@ class MedicineDetailsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 137, 18, 9),
         title: Text(medicine.medicineName),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        UpdateMedicinePage(medicine: medicine)),
+              );
+            },
+            icon: Icon(Icons.edit),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
