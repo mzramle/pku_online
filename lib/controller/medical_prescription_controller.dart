@@ -5,23 +5,35 @@ class MedicalPrescriptionController {
     MedicalPrescriptionModel(
       id: '1',
       medicineName: 'Panadol',
-      dosage: '500mg',
+      dosages: '500mg',
       instructions:
           'Take 2 tablets orally every 4-6 hours as needed. Do not exceed 8 tablets in 24 hours.',
+      category: '',
+      price: 0.0,
+      description: '',
+      imageUrl: '',
     ),
     MedicalPrescriptionModel(
       id: '2',
       medicineName: 'Antibiotics',
-      dosage: '250mg',
+      dosages: '250mg',
       instructions:
           'Take 1 capsule orally twice daily after meals for 7-10 days. Follow the full course of treatment.',
+      category: '',
+      price: 0.0,
+      description: '',
+      imageUrl: '',
     ),
     MedicalPrescriptionModel(
       id: '3',
       medicineName: 'Ibuprofen',
-      dosage: '200mg',
+      dosages: '200mg',
       instructions:
           'Take 1-2 tablets orally every 6-8 hours as needed for pain or fever. Do not exceed 6 tablets in 24 hours. Take with food or milk to reduce stomach upset.',
+      category: '',
+      price: 0.0,
+      description: '',
+      imageUrl: '',
     ),
   ];
 

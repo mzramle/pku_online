@@ -10,8 +10,8 @@ import 'package:pku_online/page/chat_page.dart';
 import 'package:pku_online/page/chatlist_page.dart';
 import 'package:pku_online/page/doctorList_page.dart';
 import 'package:pku_online/page/doctor_detail.dart';
-import 'package:pku_online/page/ecomm_page.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
+import 'package:pku_online/page/medicineshop_page.dart';
 import 'package:pku_online/page/user_profile.dart';
 import 'package:uuid/uuid.dart';
 
@@ -405,7 +405,7 @@ class CategoryIcon extends StatelessWidget {
     } else if (text == 'Shop') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ShopPage()),
+        MaterialPageRoute(builder: (context) => MedicineShopPage()),
       );
     } else if (text == 'Chat') {
       final user = FirebaseAuth.instance.currentUser;
