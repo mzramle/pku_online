@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,8 +27,10 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     if (_selectedImage != null) {
       String imageUrl = await _medicineController.uploadImage(_selectedImage!);
 
+      String id = Uuid().v4(); // Generate a random ID using the Uuid package
+
       MedicalPrescriptionModel medicine = MedicalPrescriptionModel(
-        id: '',
+        id: id,
         medicineName: _nameController.text,
         category: _categoryController.text,
         price: double.parse(_priceController.text),
