@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pku_online/core/colors.dart';
@@ -55,28 +56,33 @@ class _ScheduleTabState extends State<ScheduleTab> {
 
   Future<void> fetchBookings() async {
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('Booking').get();
-      final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
-        final data = doc.data();
-        final dateTime = (data['dateTime'] as Timestamp).toDate();
-        final doctorData = data['doctor'];
-        final doctor = Doctor(
-          name: doctorData['doctorName'],
-          title: doctorData['specialty'],
-          image: doctorData['imageUrl'],
-        );
-        return Booking(
-          id: doc.id,
-          dateTime: dateTime,
-          doctor: doctor,
-          status: data['status'],
-          userUID: data['userUID'],
-        );
-      }).toList();
-      setState(() {
-        bookings = fetchedBookings;
-      });
+      final currentUserUID = FirebaseAuth.instance.currentUser?.uid;
+      if (currentUserUID != null) {
+        final snapshot = await FirebaseFirestore.instance
+            .collection('Booking')
+            .where('userUID', isEqualTo: currentUserUID)
+            .get();
+        final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
+          final data = doc.data();
+          final dateTime = (data['dateTime'] as Timestamp).toDate();
+          final doctorData = data['doctor'];
+          final doctor = Doctor(
+            name: doctorData['doctorName'],
+            title: doctorData['specialty'],
+            image: doctorData['imageUrl'],
+          );
+          return Booking(
+            id: doc.id,
+            dateTime: dateTime,
+            doctor: doctor,
+            status: data['status'],
+            userUID: data['userUID'],
+          );
+        }).toList();
+        setState(() {
+          bookings = fetchedBookings;
+        });
+      }
     } catch (error) {
       print('Error fetching bookings: $error');
     }

@@ -531,7 +531,6 @@ class UserIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final User? currentUser = FirebaseAuth.instance.currentUser;
-    final String displayName = currentUser?.displayName ?? 'Guest';
 
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
@@ -545,6 +544,7 @@ class UserIntro extends StatelessWidget {
 
         final data = snapshot.data!.data() as Map<String, dynamic>?;
         final String? avatarUrl = data != null ? data['avatar'] : null;
+        final String displayName = data != null ? data['name'] : 'Guest';
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

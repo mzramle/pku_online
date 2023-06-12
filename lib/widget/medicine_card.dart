@@ -12,27 +12,61 @@ class MedicineCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.symmetric(
-            vertical: 20.0), // Add the desired vertical padding
-        child: Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 150, // Set the desired height for the image
-                width: double.infinity, // Make the image occupy the full width
-                child: Image.network(
-                  medicine.imageUrl,
-                  fit: BoxFit.cover,
-                  height: 200,
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey
+                  .withOpacity(0.5), // Set the desired color for the outline
+              width: 0.5, // Set the desired width for the outline
+            ),
+            borderRadius:
+                BorderRadius.circular(4.0), // Set the desired border radius
+          ),
+          child: Card(
+            elevation:
+                0.0, // Set elevation to 0 to remove the default shadow of Card
+            child: AspectRatio(
+              aspectRatio: 1, // Make the card square
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Image.network(
+                        medicine.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      medicine.medicineName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      medicine.category,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      '\RM${medicine.price.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              ListTile(
-                title: Text(medicine.medicineName),
-                subtitle: Text(medicine.category),
-                trailing: Text('\RM${medicine.price.toStringAsFixed(2)}'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

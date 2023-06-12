@@ -186,7 +186,7 @@ class _UserProfileState extends State<UserProfile> {
               ),
               SizedBox(height: 10),
               Text(
-                'Faculty of Computing',
+                'Member',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

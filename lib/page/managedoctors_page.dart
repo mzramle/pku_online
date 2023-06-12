@@ -120,6 +120,16 @@ class _ManageDoctorsScreenState extends State<ManageDoctorsScreen>
         'patient': 0,
       });
 
+      // Save the doctor's information to the "User" document
+      await FirebaseFirestore.instance.collection('User').doc(doctorId).set({
+        'avatar': imageUrl,
+        'name': _doctorNameController.text.trim(),
+        'email': email,
+        'password': password,
+        'phone': _phoneController.text.trim(),
+        'role': 'doctor',
+      });
+
       // Clear the text fields
       setState(() {
         _imageFile = null;
@@ -174,23 +184,16 @@ class _ManageDoctorsScreenState extends State<ManageDoctorsScreen>
 
   Future<bool> _deleteDoctor(String doctorId) async {
     try {
+      // Delete the doctor document from the Doctors collection
       final doctorRef =
           FirebaseFirestore.instance.collection('Doctors').doc(doctorId);
-      final doctorSnapshot = await doctorRef.get();
-      final doctorData = doctorSnapshot.data() as Map<String, dynamic>;
-
-      // Move doctor attributes to user document
-      await FirebaseFirestore.instance.collection('User').doc(doctorId).set({
-        'avatar': doctorData['imageUrl'],
-        'name': doctorData['doctorName'],
-        'email': doctorData['email'],
-        'password': doctorData['password'],
-        'phone': doctorData['phone'],
-        'role': 'user',
-      });
-
-      // Delete the doctor document
       await doctorRef.delete();
+
+      // Delete the doctor document from the User collection
+      final userRef =
+          FirebaseFirestore.instance.collection('User').doc(doctorId);
+      await userRef.delete();
+
       return true;
     } catch (error) {
       showDialog(

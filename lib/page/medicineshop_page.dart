@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pku_online/controller/medicine_controller.dart';
+import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/models/medical_prescription_model.dart';
 import 'package:pku_online/page/add_medicine_page.dart';
 import 'package:pku_online/widget/medicine_card.dart';
@@ -86,61 +87,78 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        backgroundColor: blueButton,
         title: Text('Medicine Shop'),
       ),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10.0,
-          mainAxisSpacing: 10.0,
-        ),
-        itemCount: medicines.length,
-        itemBuilder: (context, index) {
-          MedicalPrescriptionModel medicine = medicines[index];
-          return Dismissible(
-            key: Key(medicine.id), // Unique key for each medicine
-            direction: DismissDirection.startToEnd,
-            background: Container(
-              color: Colors.red,
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              alignment: AlignmentDirectional.centerStart,
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (direction) {
-              // Delete the medicine when dismissed
-              deleteMedicine(medicine);
-            },
-            child: MedicineCard(
-              medicine: medicine,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MedicineDetailsPage(medicine: medicine),
+      body: SafeArea(
+        child: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width >= 600 ? 4 : 2,
+                      crossAxisSpacing: 2.0,
+                      mainAxisSpacing: 2.0,
+                      childAspectRatio:
+                          1, // Make the card longer (adjust the value as needed)
+                    ),
+                    itemCount: medicines.length,
+                    itemBuilder: (context, index) {
+                      MedicalPrescriptionModel medicine = medicines[index];
+                      return Dismissible(
+                        key: Key(medicine.id),
+                        direction: DismissDirection.startToEnd,
+                        background: Container(
+                          color: blueButton,
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (direction) {
+                          deleteMedicine(medicine);
+                        },
+                        child: MedicineCard(
+                          medicine: medicine,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MedicineDetailsPage(
+                                  medicine: medicine,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                  SizedBox(height: 16.0),
+                ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to the add medicine page
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => AddMedicinePage(),
             ),
           ).then((_) {
-            // Refresh the medicine list after returning from add medicine page
             fetchMedicines();
           });
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.red,
+        backgroundColor: blueButton,
       ),
     );
   }
