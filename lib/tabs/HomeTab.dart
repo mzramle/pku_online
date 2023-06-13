@@ -1,19 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pku_online/controller/chat_controller.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/admin_page.dart';
 import 'package:pku_online/page/bmi_page.dart';
-import 'package:pku_online/page/chat_page.dart';
 import 'package:pku_online/page/chatlist_page.dart';
 import 'package:pku_online/page/doctorList_page.dart';
 import 'package:pku_online/page/doctor_detail.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
 import 'package:pku_online/page/medicineshop_page.dart';
 import 'package:pku_online/page/user_profile.dart';
-import 'package:uuid/uuid.dart';
 
 List<Map> doctors = [
   {

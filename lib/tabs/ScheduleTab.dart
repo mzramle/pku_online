@@ -57,31 +57,66 @@ class _ScheduleTabState extends State<ScheduleTab> {
   Future<void> fetchBookings() async {
     try {
       final currentUserUID = FirebaseAuth.instance.currentUser?.uid;
-      if (currentUserUID != null) {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('Booking')
-            .where('userUID', isEqualTo: currentUserUID)
-            .get();
-        final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
-          final data = doc.data();
-          final dateTime = (data['dateTime'] as Timestamp).toDate();
-          final doctorData = data['doctor'];
-          final doctor = Doctor(
-            name: doctorData['doctorName'],
-            title: doctorData['specialty'],
-            image: doctorData['imageUrl'],
-          );
-          return Booking(
-            id: doc.id,
-            dateTime: dateTime,
-            doctor: doctor,
-            status: data['status'],
-            userUID: data['userUID'],
-          );
-        }).toList();
-        setState(() {
-          bookings = fetchedBookings;
-        });
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('User')
+          .doc(currentUserUID)
+          .get();
+      final userData = userSnapshot.data();
+
+      if (currentUserUID != null && userData != null) {
+        if (userData['role'] == 'user') {
+          // Fetch bookings associated with user's UID
+          final snapshot = await FirebaseFirestore.instance
+              .collection('Booking')
+              .where('userUID', isEqualTo: currentUserUID)
+              .get();
+          final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
+            final data = doc.data();
+            final dateTime = (data['dateTime'] as Timestamp).toDate();
+            final doctorData = data['doctor'];
+            final doctor = Doctor(
+              name: doctorData['doctorName'],
+              title: doctorData['specialty'],
+              image: doctorData['imageUrl'],
+            );
+            return Booking(
+              id: doc.id,
+              dateTime: dateTime,
+              doctor: doctor,
+              status: data['status'],
+              userUID: data['userUID'],
+            );
+          }).toList();
+          setState(() {
+            bookings = fetchedBookings;
+          });
+        } else if (userData['role'] == 'doctor') {
+          final doctorEmail = FirebaseAuth.instance.currentUser?.email;
+          final snapshot = await FirebaseFirestore.instance
+              .collection('Booking')
+              .where('doctor.email', isEqualTo: doctorEmail)
+              .get();
+          final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
+            final data = doc.data();
+            final dateTime = (data['dateTime'] as Timestamp).toDate();
+            final doctorData = data['doctor'];
+            final doctor = Doctor(
+              name: doctorData['doctorName'],
+              title: doctorData['specialty'],
+              image: doctorData['imageUrl'],
+            );
+            return Booking(
+              id: doc.id,
+              dateTime: dateTime,
+              doctor: doctor,
+              status: data['status'],
+              userUID: data['userUID'],
+            );
+          }).toList();
+          setState(() {
+            bookings = fetchedBookings;
+          });
+        }
       }
     } catch (error) {
       print('Error fetching bookings: $error');
