@@ -133,7 +133,7 @@ class DetailBody extends StatelessWidget {
           time.minute,
         );
         if (_isTimeWithinRange(selectedDateTime)) {
-          _handleAppointmentBooking(selectedDateTime);
+          _handleAppointmentBooking(context, selectedDateTime);
         } else {
           _showTimeSelectionErrorSnackbar(context);
         }
@@ -161,18 +161,72 @@ class DetailBody extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void _handleAppointmentBooking(DateTime selectedDateTime) {
+  void _handleAppointmentBooking(
+      BuildContext context, DateTime selectedDateTime) {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      FirebaseFirestore.instance.collection('Booking').add({
-        'dateTime': selectedDateTime,
-        'doctor': doctor,
-        'userUID': user.uid,
-        'status': 'Upcoming',
-      }).then((value) {
-        print('Booking saved to the database');
+      FirebaseFirestore.instance
+          .collection('User')
+          .doc(user.uid)
+          .get()
+          .then((userSnapshot) {
+        if (userSnapshot.exists) {
+          Map<String, dynamic> userData = userSnapshot.data()!;
+          FirebaseFirestore.instance.collection('Booking').add({
+            'dateTime': selectedDateTime,
+            'doctor': {
+              'doctorName': doctor['doctorName'],
+              'specialty': doctor['specialty'],
+              'imageUrl': doctor['imageUrl'],
+            },
+            'user': userData, // Save the entire user object
+            'userUID': user.uid,
+            'doctorUID': doctor['doctorId'],
+            'status': 'Upcoming',
+          }).then((value) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('Success'),
+                  content: Text('Booking created successfully.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+            print('Booking saved to the database');
+          }).catchError((error) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('Failed to save booking: $error'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+            print('Failed to save booking: $error');
+          });
+        } else {
+          print('User does not exist');
+        }
       }).catchError((error) {
-        print('Failed to save booking: $error');
+        print('Failed to fetch user: $error');
       });
     }
   }

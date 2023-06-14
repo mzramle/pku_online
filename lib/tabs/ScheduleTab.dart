@@ -14,12 +14,25 @@ class ScheduleTab extends StatefulWidget {
 
 enum FilterStatus { Upcoming, Complete, Cancel }
 
+class User {
+  final String name;
+  final String email;
+  final String avatar;
+
+  User({
+    required this.name,
+    required this.email,
+    required this.avatar,
+  });
+}
+
 class Booking {
   final String id;
   final DateTime dateTime;
   final Doctor doctor;
   final String status;
   final String userUID;
+  final User user;
 
   Booking({
     required this.id,
@@ -27,6 +40,7 @@ class Booking {
     required this.doctor,
     required this.status,
     required this.userUID,
+    required this.user,
   });
 }
 
@@ -46,31 +60,83 @@ class _ScheduleTabState extends State<ScheduleTab> {
   FilterStatus status = FilterStatus.Upcoming;
   Alignment _alignment = Alignment.centerLeft;
   late List<Booking> bookings = [];
+  late String currentUserRole = ''; // Define currentUserRole variable
 
   @override
   void initState() {
     super.initState();
     // Fetch bookings from Firestore and initialize the `bookings` list
     fetchBookings();
+    fetchCurrentUserRole();
+  }
+
+  // Fetch the current user's role
+  Future<void> fetchCurrentUserRole() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      final currentUserUID = currentUser.uid;
+      final roleSnapshot = await FirebaseFirestore.instance
+          .collection('User')
+          .doc(currentUserUID)
+          .get();
+      setState(() {
+        currentUserRole = roleSnapshot['role'];
+      });
+    }
   }
 
   Future<void> fetchBookings() async {
     try {
-      final currentUserUID = FirebaseAuth.instance.currentUser?.uid;
-      final userSnapshot = await FirebaseFirestore.instance
-          .collection('User')
-          .doc(currentUserUID)
-          .get();
-      final userData = userSnapshot.data();
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        final currentUserUID = currentUser.uid;
+        final currentUserRole = await FirebaseFirestore.instance
+            .collection('User')
+            .doc(currentUserUID)
+            .get()
+            .then((snapshot) => snapshot['role']);
 
-      if (currentUserUID != null && userData != null) {
-        if (userData['role'] == 'user') {
-          // Fetch bookings associated with user's UID
+        List<Booking> fetchedBookings = [];
+
+        if (currentUserRole == 'doctor') {
+          final snapshot = await FirebaseFirestore.instance
+              .collection('Booking')
+              .where('doctorUID', isEqualTo: currentUserUID)
+              .get();
+
+          fetchedBookings = snapshot.docs.map((doc) {
+            final data = doc.data();
+            final dateTime = (data['dateTime'] as Timestamp).toDate();
+            final doctorData = data['doctor'];
+            final doctor = Doctor(
+              name: doctorData['doctorName'],
+              title: doctorData['specialty'],
+              image: doctorData['imageUrl'],
+            );
+
+            final userData = data['user'];
+            final user = User(
+              name: userData['name'],
+              email: userData['email'],
+              avatar: userData['avatar'],
+            );
+
+            return Booking(
+              id: doc.id,
+              dateTime: dateTime,
+              doctor: doctor,
+              status: data['status'],
+              user: user,
+              userUID: data['userUID'],
+            );
+          }).toList();
+        } else {
           final snapshot = await FirebaseFirestore.instance
               .collection('Booking')
               .where('userUID', isEqualTo: currentUserUID)
               .get();
-          final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
+
+          fetchedBookings = snapshot.docs.map((doc) {
             final data = doc.data();
             final dateTime = (data['dateTime'] as Timestamp).toDate();
             final doctorData = data['doctor'];
@@ -79,44 +145,28 @@ class _ScheduleTabState extends State<ScheduleTab> {
               title: doctorData['specialty'],
               image: doctorData['imageUrl'],
             );
+
+            final userData = data['user'];
+            final user = User(
+              name: userData['name'],
+              email: userData['email'],
+              avatar: userData['avatar'],
+            );
+
             return Booking(
               id: doc.id,
               dateTime: dateTime,
               doctor: doctor,
               status: data['status'],
+              user: user,
               userUID: data['userUID'],
             );
           }).toList();
-          setState(() {
-            bookings = fetchedBookings;
-          });
-        } else if (userData['role'] == 'doctor') {
-          final doctorEmail = FirebaseAuth.instance.currentUser?.email;
-          final snapshot = await FirebaseFirestore.instance
-              .collection('Booking')
-              .where('doctor.email', isEqualTo: doctorEmail)
-              .get();
-          final List<Booking> fetchedBookings = snapshot.docs.map((doc) {
-            final data = doc.data();
-            final dateTime = (data['dateTime'] as Timestamp).toDate();
-            final doctorData = data['doctor'];
-            final doctor = Doctor(
-              name: doctorData['doctorName'],
-              title: doctorData['specialty'],
-              image: doctorData['imageUrl'],
-            );
-            return Booking(
-              id: doc.id,
-              dateTime: dateTime,
-              doctor: doctor,
-              status: data['status'],
-              userUID: data['userUID'],
-            );
-          }).toList();
-          setState(() {
-            bookings = fetchedBookings;
-          });
         }
+
+        setState(() {
+          bookings = fetchedBookings;
+        });
       }
     } catch (error) {
       print('Error fetching bookings: $error');
@@ -217,6 +267,9 @@ class _ScheduleTabState extends State<ScheduleTab> {
                 itemBuilder: (context, index) {
                   var booking = filteredBookings[index];
                   bool isLastElement = filteredBookings.length == index + 1;
+
+                  // Check the user's role to determine whether to display user information
+                  bool isDoctor = currentUserRole == 'doctor';
                   return Card(
                     margin: !isLastElement
                         ? EdgeInsets.only(bottom: 20)
@@ -229,27 +282,30 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(booking.doctor.image),
+                                backgroundImage: NetworkImage(
+                                  isDoctor
+                                      ? booking.user.avatar
+                                      : booking.doctor.image,
+                                ),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
+                              SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    booking.doctor.name,
+                                    isDoctor
+                                        ? booking.user.name
+                                        : booking.doctor.name,
                                     style: TextStyle(
                                       color: Color(MyColors.header01),
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
+                                  SizedBox(height: 5),
                                   Text(
-                                    booking.doctor.title,
+                                    isDoctor
+                                        ? booking.user.email
+                                        : booking.doctor.title,
                                     style: TextStyle(
                                       color: Color(MyColors.grey02),
                                       fontSize: 12,
@@ -436,6 +492,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                 doctor: b.doctor,
                 status: 'Cancel',
                 userUID: b.userUID,
+                user: b.user,
               );
             }
             return b;

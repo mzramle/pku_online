@@ -93,7 +93,9 @@ class _ManageDoctorsScreenState extends State<ManageDoctorsScreen>
 
       // Create a temporary Firebase app instance
       FirebaseApp tempApp = await Firebase.initializeApp(
-          name: "flutter", options: Firebase.app().options);
+        name: "flutter",
+        options: Firebase.app().options,
+      );
 
       // Create the doctor's account in Firebase Auth using the temporary app instance
       final email = _emailController.text.trim();
@@ -106,8 +108,9 @@ class _ManageDoctorsScreenState extends State<ManageDoctorsScreen>
       // Upload the doctor's image to Firebase Storage
       final imageUrl = await _uploadImageToStorage(doctorId);
 
-      // Save the doctor's data to Firestore
+      // Save the doctor's data to Firestore with the doctor UID
       await FirebaseFirestore.instance.collection('Doctors').doc(doctorId).set({
+        'doctorId': doctorId, // Add the doctor UID (document ID)
         'doctorName': _doctorNameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'specialty': _specialtyController.text.trim(),
