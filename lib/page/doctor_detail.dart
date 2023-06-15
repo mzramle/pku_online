@@ -177,6 +177,7 @@ class DetailBody extends StatelessWidget {
             'doctor': {
               'doctorName': doctor['doctorName'],
               'specialty': doctor['specialty'],
+              'email': doctor['email'],
               'imageUrl': doctor['imageUrl'],
             },
             'user': userData, // Save the entire user object
