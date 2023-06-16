@@ -405,8 +405,8 @@ class CategoryIcon extends StatelessWidget {
         MaterialPageRoute(builder: (context) => MedicineShopPage()),
       );
     } else if (text == 'Chat') {
-      final user = FirebaseAuth.instance.currentUser;
-      final userId = user?.uid;
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final userId = currentUser?.uid;
 
       if (userId == null) {
         // Handle the case where the user is not authenticated
@@ -419,19 +419,28 @@ class CategoryIcon extends StatelessWidget {
           .get();
 
       final bookings = snapshot.docs;
-      final doctors = bookings.map((booking) {
+      final doctors = <dynamic>[];
+      final users = <dynamic>[];
+
+      for (final booking in bookings) {
         final doctor = booking.data()['doctor'];
-        return doctor;
-      }).toList();
+        final doctorUID = booking.data()['doctorUID'];
+
+        if (doctorUID == userId) {
+          // User is a doctor, get the related user object from the booking
+          final user = booking.data()['user'];
+          users.add(user);
+        } else {
+          doctors.add(doctor);
+        }
+      }
 
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ChatListScreen(
             doctors: doctors,
-            onDoctorSelected: (doctor) {
-              // Handle doctor selection
-            },
+            users: users,
           ),
         ),
       );

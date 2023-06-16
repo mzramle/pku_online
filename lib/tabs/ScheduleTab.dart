@@ -270,6 +270,15 @@ class _ScheduleTabState extends State<ScheduleTab> {
 
                   // Check the user's role to determine whether to display user information
                   bool isDoctor = currentUserRole == 'doctor';
+
+                  // Get today's date without time
+                  DateTime today = DateTime.now().toLocal();
+                  DateTime bookingDate = booking.dateTime.toLocal();
+
+                  bool isToday = today.year == bookingDate.year &&
+                      today.month == bookingDate.month &&
+                      today.day == bookingDate.day;
+
                   return Card(
                     margin: !isLastElement
                         ? EdgeInsets.only(bottom: 20)
@@ -316,15 +325,9 @@ class _ScheduleTabState extends State<ScheduleTab> {
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          DateTimeCard(
-                            dateTime: booking.dateTime,
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
+                          SizedBox(height: 15),
+                          DateTimeCard(dateTime: booking.dateTime),
+                          SizedBox(height: 15),
                           if (booking.status == 'Upcoming')
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -351,14 +354,10 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                       ), // Button shape
                                     ),
                                     child: Text(
-                                      booking.dateTime ==
-                                              DateTime.now().toLocal()
-                                          ? 'Chat'
-                                          : 'Cancel',
+                                      isToday ? 'Chat' : 'Cancel',
                                     ),
                                     onPressed: () {
-                                      if (booking.dateTime ==
-                                          DateTime.now().toLocal()) {
+                                      if (isToday) {
                                         // Redirect to chat page
                                         navigateToChatPage();
                                       } else {
@@ -368,9 +367,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                     },
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 20,
-                                ),
+                                SizedBox(width: 20),
                                 Expanded(
                                   child: ElevatedButton(
                                     style: ButtonStyle(

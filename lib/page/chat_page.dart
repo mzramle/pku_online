@@ -57,7 +57,7 @@ class _ChatPageState extends State<ChatPage> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('Chats')
+                  .collection('chats')
                   .doc(getChatId())
                   .collection('messages')
                   .orderBy('timestamp', descending: true)
