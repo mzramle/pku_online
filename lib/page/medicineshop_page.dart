@@ -21,6 +21,7 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
   final MedicineController _medicineController = MedicineController();
   List<MedicalPrescriptionModel> cartItems = [];
   String currentUserRole = '';
+  Map<String, int> cartQuantities = {}; // Store medicine ID and quantity
 
   @override
   void initState() {
@@ -105,12 +106,28 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
   void addToCart(MedicalPrescriptionModel medicine) {
     setState(() {
       cartItems.add(medicine);
+
+      // Increase quantity for the specific medicine in the cart
+      if (cartQuantities.containsKey(medicine.id)) {
+        cartQuantities[medicine.id] = cartQuantities[medicine.id]! + 1;
+      } else {
+        cartQuantities[medicine.id] = 1;
+      }
     });
   }
 
   void removeFromCart(MedicalPrescriptionModel medicine) {
     setState(() {
       cartItems.remove(medicine);
+
+      // Decrease quantity for the specific medicine in the cart
+      if (cartQuantities.containsKey(medicine.id)) {
+        cartQuantities[medicine.id] =
+            (cartQuantities[medicine.id]! - 1).clamp(0, 9999);
+        if (cartQuantities[medicine.id] == 0) {
+          cartQuantities.remove(medicine.id);
+        }
+      }
     });
   }
 
@@ -142,6 +159,8 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
                     itemBuilder: (context, index) {
                       MedicalPrescriptionModel medicine = medicines[index];
                       bool isInCart = cartItems.contains(medicine);
+                      int medQuantity = cartQuantities[medicine.id] ??
+                          0; // Get the quantity from cartQuantities
 
                       return Dismissible(
                         key: Key(medicine.id),
@@ -176,6 +195,10 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
                               removeFromCart(medicine);
                             }
                           },
+
+                          // Pass the quantity for the specific medicine to the MedicineCard widget
+                          medCardQuantity:
+                              medQuantity, // Pass the quantity to MedicineCard
                           currentUserRole: currentUserRole,
                         ),
                       );
@@ -203,7 +226,18 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
               child: Icon(Icons.add),
               backgroundColor: blueButton,
             )
-          : null,
+          : currentUserRole == 'user'
+              ? FloatingActionButton(
+                  onPressed: () {
+                    setState(() {
+                      cartItems.clear();
+                      cartQuantities.clear();
+                    });
+                  },
+                  child: Icon(Icons.clear_all_rounded),
+                  backgroundColor: Colors.red,
+                )
+              : null,
       bottomNavigationBar: currentUserRole == 'user'
           ? BottomAppBar(
               child: Container(

@@ -5,29 +5,66 @@ import 'package:pku_online/models/medical_prescription_model.dart';
 class CartPage extends StatelessWidget {
   final List<MedicalPrescriptionModel> cartItems;
 
-  const CartPage({required this.cartItems});
+  CartPage({required this.cartItems});
 
   @override
   Widget build(BuildContext context) {
+    // Create a map to store the medicines and their quantities
+    Map<MedicalPrescriptionModel, int> medicineQuantities = {};
+
+    // Calculate the quantities for each medicine
+    for (var item in cartItems) {
+      if (medicineQuantities.containsKey(item)) {
+        medicineQuantities[item] = medicineQuantities[item]! + 1;
+      } else {
+        medicineQuantities[item] = 1;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: blueButton,
         title: Text('Cart'),
       ),
       body: ListView.builder(
-        itemCount: cartItems.length,
+        itemCount: medicineQuantities.length,
         itemBuilder: (context, index) {
-          MedicalPrescriptionModel item = cartItems[index];
+          MedicalPrescriptionModel medicine =
+              medicineQuantities.keys.elementAt(index);
+          int medQuantity = medicineQuantities[medicine]!;
+          double medicineTotal =
+              calculateMedicineTotal(medicine.price, medQuantity);
+
           return ListTile(
             leading: Image.network(
-              item.imageUrl,
+              medicine.imageUrl,
               width: 40,
               height: 40,
               fit: BoxFit.cover,
             ),
-            title: Text(item.medicineName),
-            subtitle: Text(item.category),
-            trailing: Text('\RM${item.price.toStringAsFixed(2)}'),
+            title: Text('${medicine.medicineName}'),
+            subtitle: Text(medicine.category),
+            trailing: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('x$medQuantity\t'),
+                    Text('\RM${medicine.price.toStringAsFixed(2)}'),
+                    SizedBox(width: 4.0),
+                  ],
+                ),
+                Text(
+                  'Total: \RM${medicineTotal.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: const Color.fromARGB(255, 148, 0, 0),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -62,6 +99,10 @@ class CartPage extends StatelessWidget {
     );
   }
 
+  double calculateMedicineTotal(double price, int quantity) {
+    return price * quantity;
+  }
+
   double calculateTotal() {
     double total = 0;
     for (var item in cartItems) {
@@ -70,3 +111,6 @@ class CartPage extends StatelessWidget {
     return total;
   }
 }
+
+
+//'Total: \RM${medicineTotal.toStringAsFixed(2)}'

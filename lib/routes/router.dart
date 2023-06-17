@@ -9,6 +9,6 @@ Map<String, Widget Function(BuildContext)> routes = {
   '/detail': (context) => SliverDoctorDetail(
         doctor: {},
       ),
-  '/paymentdetails': (BuildContext context) => UserPaymentDetailsPage(),
+  '/carddetails': (BuildContext context) => UserCardDetailsPage(),
   '/userprofile': (BuildContext context) => UserProfile()
 };

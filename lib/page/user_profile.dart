@@ -230,7 +230,7 @@ class _UserProfileState extends State<UserProfile> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => UserPaymentDetailsPage()));
+                            builder: (context) => UserCardDetailsPage()));
                   },
                 ),
               ),
