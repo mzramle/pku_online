@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 
@@ -63,6 +61,7 @@ extension OnPressed on Widget {
                     shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(borderRadius: borderRadius))),
                 onPressed: () {
+                  // ignore: unnecessary_null_comparison
                   if (onPressed != null) {
                     onPressed();
                   }

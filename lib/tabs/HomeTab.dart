@@ -405,44 +405,41 @@ class CategoryIcon extends StatelessWidget {
         MaterialPageRoute(builder: (context) => MedicineShopPage()),
       );
     } else if (text == 'Chat') {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      final userId = currentUser?.uid;
-
-      if (userId == null) {
-        // Handle the case where the user is not authenticated
-        return;
-      }
-
-      final snapshot = await FirebaseFirestore.instance
-          .collection('Booking')
-          .where('userUID', isEqualTo: userId)
-          .get();
-
-      final bookings = snapshot.docs;
-      final doctors = <dynamic>[];
-      final users = <dynamic>[];
-
-      for (final booking in bookings) {
-        final doctor = booking.data()['doctor'];
-        final doctorUID = booking.data()['doctorUID'];
-
-        if (doctorUID == userId) {
-          // User is a doctor, get the related user object from the booking
-          final user = booking.data()['user'];
-          users.add(user);
-        } else {
-          doctors.add(doctor);
-        }
-      }
-
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => ChatListScreen(
-            doctors: doctors,
-            users: users,
-          ),
-        ),
+        MaterialPageRoute(builder: (context) => ChatListPage()),
+        // final currentUser = FirebaseAuth.instance.currentUser;
+        // final userId = currentUser?.uid;
+
+        // if (userId == null) {
+        //   // Handle the case where the user is not authenticated
+        //   return;
+        // }
+
+        // final userSnapshot = await FirebaseFirestore.instance
+        //     .collection('Booking')
+        //     .where('doctorUID', isEqualTo: userId)
+        //     .get();
+
+        // final doctorSnapshot = await FirebaseFirestore.instance
+        //     .collection('Booking')
+        //     .where('userUID', isEqualTo: userId)
+        //     .get();
+
+        // final users = userSnapshot.docs.map((doc) => doc.data()['user']).toList();
+        // final doctors =
+        //     doctorSnapshot.docs.map((doc) => doc.data()['doctor']).toList();
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ChatListScreen(
+        //       doctors: doctors,
+        //       users: users,
+        //     ),
+        //   ),
+        // );
+        // }
       );
     }
   }

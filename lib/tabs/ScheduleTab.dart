@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
+import 'package:pku_online/page/chat_page.dart';
 
 class ScheduleTab extends StatefulWidget {
   const ScheduleTab({Key? key}) : super(key: key);
@@ -48,11 +49,13 @@ class Doctor {
   final String name;
   final String title;
   final String image;
+  final String email;
 
   Doctor({
     required this.name,
     required this.title,
     required this.image,
+    required this.email,
   });
 }
 
@@ -112,6 +115,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
               name: doctorData['doctorName'],
               title: doctorData['specialty'],
               image: doctorData['imageUrl'],
+              email: doctorData['email'],
             );
 
             final userData = data['user'];
@@ -144,6 +148,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
               name: doctorData['doctorName'],
               title: doctorData['specialty'],
               image: doctorData['imageUrl'],
+              email: doctorData['email'],
             );
 
             final userData = data['user'];
@@ -359,7 +364,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                     onPressed: () {
                                       if (isToday) {
                                         // Redirect to chat page
-                                        navigateToChatPage();
+                                        navigateToChatPage(booking);
                                       } else {
                                         // Change booking status to 'Cancel'
                                         cancelBooking(booking);
@@ -390,7 +395,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                     child: Text('Reschedule'),
                                     onPressed: () {
                                       // Redirect to doctor's detail page
-                                      navigateToDoctorDetail(booking.doctor);
+                                      navigateToDoctorDetail();
                                     },
                                   ),
                                 ),
@@ -454,7 +459,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
                                     child: Text('Reschedule'),
                                     onPressed: () {
                                       // Redirect to chat page
-                                      navigateToChatPage();
+                                      navigateToDoctorDetail();
                                     },
                                   ),
                                 ),
@@ -503,7 +508,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
     }
   }
 
-  void navigateToDoctorDetail(Doctor doctor) {
+  void navigateToDoctorDetail() {
     // TODO: Navigate to the doctor's detail page and pass the doctor object
   }
 
@@ -511,8 +516,37 @@ class _ScheduleTabState extends State<ScheduleTab> {
     // TODO: Navigate to the payment page and pass the booking information along with the doctor object
   }
 
-  void navigateToChatPage() {
-    // TODO: Navigate to the chat page
+  void navigateToChatPage(Booking booking) {
+    FirebaseFirestore.instance
+        .collection('Booking')
+        .doc(booking.id)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        var data = snapshot.data()!;
+
+        print('Fetched data: $data');
+
+        // Fetch doctor details
+        var doctorData = data['doctor'];
+
+        // Fetch user details
+        var userData = data['user'];
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+                selectedDoctor: doctorData,
+                selectedUser: userData,
+                chatId: null,
+                bookingId: booking.id),
+          ),
+        );
+      }
+    }).catchError((error) {
+      print('Error fetching booking data: $error');
+    });
   }
 }
 
