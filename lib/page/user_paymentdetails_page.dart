@@ -141,7 +141,7 @@ class _UserCardDetailsPageState extends State<UserCardDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        backgroundColor: blueButton,
         title: Text('User Profile'),
         actions: [
           if (!_isNewPaymentDetails)
