@@ -1,3 +1,5 @@
+// cart_controller.dart
+
 import 'package:pku_online/models/cart_item_model.dart';
 
 class CartController {
@@ -16,5 +18,17 @@ class CartController {
 
   void clearCart() {
     cartModel.clearCart();
+  }
+
+  double calculateTotal() {
+    double total = 0;
+    for (var item in cartModel.cartItems) {
+      total += item.price;
+    }
+    return total;
+  }
+
+  double calculateMedicineTotal(double price, int quantity) {
+    return price * quantity;
   }
 }

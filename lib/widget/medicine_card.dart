@@ -6,14 +6,17 @@ class MedicineCard extends StatelessWidget {
   final Function() onTap;
   final Function() onRemoveFromCart;
   final Function() onAddToCart;
-  final String currentUserRole; // Add this line
+  final int medCardQuantity; // Add medCardQuantity as a parameter
+
+  final String currentUserRole;
 
   const MedicineCard({
     required this.medicine,
     required this.onTap,
     required this.onRemoveFromCart,
     required this.onAddToCart,
-    required this.currentUserRole, // Add this line
+    required this.medCardQuantity,
+    required this.currentUserRole,
   });
 
   @override
@@ -89,7 +92,7 @@ class MedicineCard extends StatelessWidget {
                                 height: 32,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.red,
+                                  color: Color.fromARGB(255, 180, 75, 0),
                                 ),
                                 child: IconButton(
                                   onPressed: onRemoveFromCart,
@@ -110,6 +113,20 @@ class MedicineCard extends StatelessWidget {
                                   icon: Icon(Icons.add),
                                   color: Colors.white,
                                   padding: EdgeInsets.zero,
+                                ),
+                              ),
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color.fromARGB(255, 122, 0, 0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "x$medCardQuantity",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
                             ],
