@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pku_online/core/Icon_Content.dart';
@@ -9,25 +11,67 @@ import 'Results_Page.dart';
 import 'package:pku_online/core/BottomContainer_Button.dart';
 import 'package:pku_online/core/calculator.dart';
 
-// ignore: must_be_immutable
-class BMIPage extends StatefulWidget {
-  @override
-  _BMIPageState createState() => _BMIPageState();
-}
-
-//ENUMERATION : The action of establishing number of something , implicit way
 enum Gender {
   male,
   female,
 }
 
-class _BMIPageState extends State<BMIPage> {
-  //by default male will be selected
+class BMIPage extends StatefulWidget {
+  @override
+  _BMIPageState createState() => _BMIPageState();
+}
 
+class _BMIPageState extends State<BMIPage> {
   late Gender selectedGender = Gender.male;
   int height = 180;
   int weight = 50;
   int age = 20;
+
+  // Declare Firestore collection reference and current user ID
+  CollectionReference userBMIResultCollection =
+      FirebaseFirestore.instance.collection('userBMIResult');
+  late String currentUserId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the current user ID
+    currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+  }
+
+  // Save BMI data to Firestore
+  void saveData() async {
+    Calculate calc = Calculate(height: height, weight: weight);
+
+    // Prepare the data to be stored
+    final data = {
+      'userId': currentUserId,
+      'gender': selectedGender.toString().split('.').last,
+      'height': height,
+      'weight': weight,
+      'age': age,
+      'bmi': calc.result(),
+      'resultText': calc.getText(),
+      'advise': calc.getAdvise(),
+    };
+
+    // Store the data in Firestore
+    await userBMIResultCollection.doc(currentUserId).set(data);
+
+    // Navigate to the ResultPage
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          bmi: calc.result(),
+          resultText: calc.getText(),
+          advise: calc.getAdvise(),
+          textColor: calc.getTextColor(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,8 +161,8 @@ class _BMIPageState extends State<BMIPage> {
                     ),
                     child: Slider(
                       value: height.toDouble(),
-                      min: 120,
-                      max: 220,
+                      min: 100.0,
+                      max: 220.0,
                       onChanged: (double newValue) {
                         setState(() {
                           height = newValue.round();
@@ -159,7 +203,7 @@ class _BMIPageState extends State<BMIPage> {
                               },
                             ),
                             SizedBox(
-                              width: 15.0,
+                              width: 10.0,
                             ),
                             RoundIconButton(
                               icon: FontAwesomeIcons.plus,
@@ -200,7 +244,9 @@ class _BMIPageState extends State<BMIPage> {
                                 });
                               },
                             ),
-                            SizedBox(width: 15.0),
+                            SizedBox(
+                              width: 10.0,
+                            ),
                             RoundIconButton(
                               icon: FontAwesomeIcons.plus,
                               onPressed: () {
@@ -220,34 +266,10 @@ class _BMIPageState extends State<BMIPage> {
           ),
           BottomContainer(
             text: 'Calculate',
-            onTap: () {
-              Calculate calc = Calculate(height: height, weight: weight);
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResultPage(
-                    bmi: calc.result(),
-                    resultText: calc.getText(),
-                    advise: calc.getAdvise(),
-                    textColor: calc.getTextColor(),
-                  ),
-                ),
-              );
-            },
+            onTap: saveData,
           ),
         ],
       ),
-
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      //   child: Icon(
-      //     Icons.favorite,
-      //     color: Colors.pink,
-      //     size: 23.0,
-      //   ),
-      //   backgroundColor: kactiveCardColor,
-      // ),
     );
   }
 }
