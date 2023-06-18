@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pku_online/controller/medicine_controller.dart';
+import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/models/medical_prescription_model.dart';
 
 class UpdateMedicinePage extends StatefulWidget {
@@ -80,7 +81,7 @@ class _UpdateMedicinePageState extends State<UpdateMedicinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        backgroundColor: blueButton,
         title: Text('Update Medicine'),
       ),
       body: SingleChildScrollView(
@@ -143,7 +144,7 @@ class _UpdateMedicinePageState extends State<UpdateMedicinePage> {
               onPressed: updateMedicine,
               child: Text('Update Medicine'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 137, 18, 9),
+                backgroundColor: blueButton,
               ),
             ),
           ],

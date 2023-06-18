@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/models/medical_prescription_model.dart';
 import 'package:pku_online/page/update_medicine_page.dart';
 
@@ -17,9 +18,9 @@ class MedicineDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        backgroundColor: blueButton,
         title: Text(medicine.medicineName),
-        actions: currentUserRole == 'admin'
+        actions: currentUserRole == 'doctor'
             ? [
                 IconButton(
                   onPressed: () {

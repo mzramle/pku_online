@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:pku_online/core/colors.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:flutter/material.dart';
@@ -90,7 +91,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 137, 18, 9),
+        backgroundColor: blueButton,
         title: Text('Add Medicine'),
       ),
       body: SingleChildScrollView(
@@ -151,7 +152,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
               onPressed: addMedicine,
               child: Text('Add Medicine'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 137, 18, 9),
+                backgroundColor: blueButton,
               ),
             ),
           ],
