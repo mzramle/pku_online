@@ -1,5 +1,9 @@
+// ReportTab.dart
+
 import 'package:flutter/material.dart';
 import 'package:pku_online/controller/report_controller.dart';
+import 'package:pku_online/core/Icon_Content.dart';
+import 'package:pku_online/core/colors.dart';
 
 class ReportTab extends StatefulWidget {
   @override
@@ -13,21 +17,25 @@ class _ReportTabState extends State<ReportTab> {
   void initState() {
     super.initState();
     _reportController = ReportController();
+    _fetchUserData(); // Fetch user data when the widget is initialized
+  }
+
+  void _fetchUserData() async {
+    await _reportController.fetchUserData();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Icon(
-          Icons.arrow_back_ios_outlined,
-          color: Colors.black,
-        ),
+        backgroundColor: white,
         elevation: 0,
-        title: Text('Report',
-            style: TextStyle(color: Colors.black, fontSize: 24.0),
-            textAlign: TextAlign.left),
+        title: Text(
+          'Report',
+          style: TextStyle(color: Colors.black, fontSize: 24.0),
+          textAlign: TextAlign.left,
+        ),
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -42,7 +50,7 @@ class _ReportTabState extends State<ReportTab> {
                   title: Padding(
                     padding: EdgeInsets.all(12),
                     child: Text(
-                      'Heart Rate',
+                      'BMI',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.black,
@@ -62,12 +70,13 @@ class _ReportTabState extends State<ReportTab> {
                           ),
                           children: [
                             TextSpan(
-                                text:
-                                    '${_reportController.model.heartRateBpm}'),
+                              text: '${_reportController.model.bmi}',
+                            ),
                             TextSpan(
-                              text: ' bpm',
+                              text:
+                                  '\n${_reportController.model.bmiResultText}',
                               style: TextStyle(
-                                fontSize: 20.0,
+                                fontSize: 15.0,
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
@@ -76,11 +85,14 @@ class _ReportTabState extends State<ReportTab> {
                       ),
                     ),
                   ),
-                  trailing: Icon(Icons.monitor_heart_outlined,
-                      color: Color.fromARGB(255, 22, 111, 219), size: 120),
+                  trailing: Icon(
+                    Icons.accessibility_new_outlined,
+                    color: Color.fromARGB(255, 22, 111, 219),
+                    size: 120,
+                  ),
                   contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
                   onTap: () {
-                    // Handle heart rate tap
+                    // Handle BMI tap
                   },
                 ),
               ),
@@ -88,52 +100,20 @@ class _ReportTabState extends State<ReportTab> {
           ),
           SizedBox(height: 16.0),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
             child: Row(
               children: [
                 Expanded(
                   child: Card(
                     color: Color(0xFFF5E1E9),
                     child: ListTile(
-                      leading: Icon(
-                        Icons.bloodtype,
-                        color: Color(0xFF9D4C6C),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 0.0,
+                        vertical: 0.0,
                       ),
-                      title: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Blood Group',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      subtitle: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Text(
-                          _reportController.model.bloodGroup,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        // Handle blood group tap
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16.0),
-                Expanded(
-                  child: Card(
-                    color: Color(0xFFFAF0DB),
-                    child: ListTile(
                       leading: Icon(
                         Icons.monitor_weight_outlined,
-                        color: Color(0xFFE09F1F),
+                        color: Color(0xFFE2093B),
                       ),
                       title: Align(
                         alignment: Alignment.centerLeft,
@@ -156,9 +136,43 @@ class _ReportTabState extends State<ReportTab> {
                           ),
                         ),
                       ),
-                      onTap: () {
-                        // Handle weight tap
-                      },
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16.0),
+                Expanded(
+                  child: Card(
+                    color: Color(0xFFFAF0DB),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 0.0,
+                        vertical: 0.0,
+                      ),
+                      leading: Icon(
+                        Icons.height_outlined,
+                        color: Color(0xFFE09F1F),
+                      ),
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Height',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      subtitle: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          '${_reportController.model.height} cm',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

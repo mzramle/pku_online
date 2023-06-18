@@ -1,13 +1,15 @@
 class ReportModel {
-  int heartRateBpm;
-  String bloodGroup;
+  String bmi;
+  String bmiResultText;
   double weight;
+  double height;
   List<String> latestReports;
 
   ReportModel({
-    required this.heartRateBpm,
-    required this.bloodGroup,
+    required this.bmi,
+    required this.bmiResultText,
     required this.weight,
+    required this.height,
     required this.latestReports,
   });
 }
