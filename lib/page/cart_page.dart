@@ -133,25 +133,30 @@ class CartPage extends StatelessWidget {
           FirebaseFirestore.instance.collection('Cart');
 
       // Check if the user's cart already exists
-      QuerySnapshot cartSnapshot = await cartCollection
-          .where('userId', isEqualTo: userId)
-          .limit(1)
-          .get();
+      QuerySnapshot cartSnapshot =
+          await cartCollection.doc(userId).collection('Items').limit(1).get();
 
       if (cartSnapshot.docs.isNotEmpty) {
-        // Update the existing cart
-        String cartId = cartSnapshot.docs[0].id;
-        await cartCollection.doc(cartId).update({
-          'total': total,
-        });
-      } else {
-        // Create a new cart entry
-        await cartCollection.add({
-          'total': total,
+        // Clear the existing cart items
+        for (var doc in cartSnapshot.docs) {
+          await doc.reference.delete();
+        }
+      }
+
+      // Add the cart items to the cart collection
+      for (var item in cartItems) {
+        await cartCollection.doc(userId).collection('Items').add({
+          'medicineName': item.medicineName,
+          'category': item.category,
+          'price': item.price,
+          'quantity': 1, // Assuming quantity is always 1 for now
         });
       }
 
-      // Implement the logic to proceed with the checkout
+      // Update the total value of the cart
+      await cartCollection.doc(userId).set({
+        'total': total,
+      });
     }
   }
 }

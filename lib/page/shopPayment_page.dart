@@ -22,63 +22,42 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
 
   void _fetchCartItems() async {
     try {
-      final querySnapshot = await FirebaseFirestore.instance
+      final cartSnapshot = await FirebaseFirestore.instance
           .collection('Cart')
           .doc(currentUserId)
-          .collection('Items')
           .get();
 
-      List<String> medicineIds =
-          querySnapshot.docs.map((doc) => doc.id).toList();
+      if (cartSnapshot.exists) {
+        var cartData = cartSnapshot.data();
 
-      print('Medicine IDs: $medicineIds');
+        double tempTotal = cartData?['total'] ?? 0.0;
 
-      List<Map<String, dynamic>> tempCartItems = [];
-      double tempSubtotal = 0.0;
-
-      for (String medicineId in medicineIds) {
-        final medicineSnapshot = await FirebaseFirestore.instance
-            .collection('Cart')
-            .doc(currentUserId)
-            .collection('Items')
-            .doc(medicineId)
-            .get();
-
-        if (medicineSnapshot.exists) {
-          var medicineData = medicineSnapshot.data();
-
-          String? imageUrl = medicineData?['imageUrl'] as String?;
-          String? medicineName = medicineData?['medicineName'] as String?;
-          int? quantity = medicineData?['quantity'] as int?;
-          double? price = medicineData?['price'] as double?;
-
-          if (imageUrl != null &&
-              medicineName != null &&
-              quantity != null &&
-              price != null) {
-            tempSubtotal += price * quantity;
-
-            tempCartItems.add({
-              'imageUrl': imageUrl,
-              'medicineName': medicineName,
-              'quantity': quantity,
-              'price': price,
-            });
-          }
-
-          print('Medicine ID: $medicineId');
-          print('Medicine Information: $medicineData');
-        }
+        setState(() {
+          total = tempTotal;
+        });
       }
-
-      setState(() {
-        cartItems = tempCartItems;
-        subtotal = tempSubtotal;
-        total = tempSubtotal; // Assuming no additional charges for now
-      });
     } catch (error) {
       // Handle error fetching cart items
       print('Error fetching cart items: $error');
+    }
+  }
+
+  void _clearCartItems() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('Cart')
+          .doc(currentUserId)
+          .collection('Items')
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+      });
+
+      print('Cart items cleared successfully.');
+    } catch (error) {
+      print('Error clearing cart items: $error');
     }
   }
 
@@ -88,6 +67,13 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
       appBar: AppBar(
         title: Text('Purchase Summary'),
         backgroundColor: blueButton,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            _clearCartItems(); // Call the method to clear cart items
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Container(
         padding: EdgeInsets.all(16.0),
@@ -108,33 +94,85 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
                     ),
                   ),
                   SizedBox(height: 8.0),
-                  Container(
-                    height: 200,
-                    child: ListView.separated(
-                      itemCount: cartItems.length,
-                      separatorBuilder: (context, index) => Divider(),
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> item = cartItems[index];
-                        double subtotalPerItem =
-                            item['price'] * item['quantity'];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(item['imageUrl']),
-                          ),
-                          title: Text(item['medicineName']),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Quantity: ${item['quantity']}'),
-                              Text(
-                                  'Price: RM${item['price'].toStringAsFixed(2)}'),
-                              Text(
-                                  'Subtotal: RM${subtotalPerItem.toStringAsFixed(2)}'),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('Cart')
+                        .doc(currentUserId)
+                        .collection('Items')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error fetching cart items');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+
+                      List<Map<String, dynamic>> tempCartItems = [];
+                      Map<String, dynamic> cartItemsMap = {};
+
+                      snapshot.data?.docs.forEach((doc) {
+                        if (doc.exists) {
+                          var medicineData = doc.data();
+
+                          String? medicineName = (medicineData
+                                  as Map<String, dynamic>)['medicineName']
+                              as String?;
+                          int? quantity = (medicineData)['quantity'] as int?;
+                          double? price = (medicineData)['price'] as double?;
+
+                          if (medicineName != null &&
+                              quantity != null &&
+                              price != null) {
+                            if (cartItemsMap.containsKey(medicineName)) {
+                              // If the item already exists, update the quantity and subtotal
+                              cartItemsMap[medicineName]['quantity'] +=
+                                  quantity;
+                              cartItemsMap[medicineName]['subtotal'] +=
+                                  (price * quantity);
+                            } else {
+                              // If the item does not exist, add it to the map
+                              cartItemsMap[medicineName] = {
+                                'medicineName': medicineName,
+                                'quantity': quantity,
+                                'price': price,
+                                'subtotal': price * quantity,
+                              };
+                            }
+                          }
+                        }
+                      });
+
+                      // Convert the map to a list
+                      tempCartItems = cartItemsMap.values
+                          .toList()
+                          .cast<Map<String, dynamic>>();
+
+                      return Container(
+                        height: 200,
+                        child: ListView.builder(
+                          itemCount: tempCartItems.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> item = tempCartItems[index];
+
+                            return ListTile(
+                              title: Text(item['medicineName']),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Quantity: ${item['quantity']}'),
+                                  Text(
+                                      'Price: RM${item['price'].toStringAsFixed(2)}'),
+                                  Text(
+                                      'Subtotal: RM${item['subtotal'].toStringAsFixed(2)}'),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -152,7 +190,7 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
                   ),
                 ),
                 SizedBox(height: 8.0),
-                Text('Subtotal: RM${subtotal.toStringAsFixed(2)}'),
+                //    Text('Subtotal: RM${subtotal.toStringAsFixed(2)}'),
                 Text('Total: RM${total.toStringAsFixed(2)}'),
               ],
             ),

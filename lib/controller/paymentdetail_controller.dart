@@ -23,8 +23,6 @@ class PaymentDetailsController {
       cvv: int.parse(cvvController.text),
     );
 
-    // TODO: Implement the logic to save the payment details
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Payment details saved')),
     );
