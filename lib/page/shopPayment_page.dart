@@ -12,7 +12,7 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
   double subtotal = 0.0;
   double total = 0.0;
-  List<CartItem> cartItems = [];
+  List<Map<String, dynamic>> cartItems = [];
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
 
       print('Medicine IDs: $medicineIds');
 
-      List<CartItem> tempCartItems = [];
+      List<Map<String, dynamic>> tempCartItems = [];
       double tempSubtotal = 0.0;
 
       for (String medicineId in medicineIds) {
@@ -58,12 +58,12 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
               price != null) {
             tempSubtotal += price * quantity;
 
-            tempCartItems.add(CartItem(
-              imageUrl: imageUrl,
-              medicineName: medicineName,
-              quantity: quantity,
-              price: price,
-            ));
+            tempCartItems.add({
+              'imageUrl': imageUrl,
+              'medicineName': medicineName,
+              'quantity': quantity,
+              'price': price,
+            });
           }
 
           print('Medicine ID: $medicineId');
@@ -89,122 +89,94 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
         title: Text('Purchase Summary'),
         backgroundColor: blueButton,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Container(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Purchase Summary Section
-                    // Purchase Summary Section
-                    Container(
-                      margin: EdgeInsets.only(bottom: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Purchase Summary',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8.0),
-                          Container(
-                            height: 200, // Specify a height for the container
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: cartItems.length,
-                              itemBuilder: (context, index) {
-                                CartItem item = cartItems[index];
-                                double subtotalPerItem =
-                                    item.price * item.quantity;
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(item.imageUrl),
-                                  ),
-                                  title: Text(item.medicineName),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Quantity: ${item.quantity}'),
-                                      Text(
-                                          'Price: RM${item.price.toStringAsFixed(2)}'),
-                                      Text(
-                                          'Subtotal: RM${subtotalPerItem.toStringAsFixed(2)}'),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Divider(), // Divider line
-                        ],
-                      ),
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Purchase Summary Section
+            Container(
+              margin: EdgeInsets.only(bottom: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Purchase Summary',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Container(
+                    height: 200,
+                    child: ListView.separated(
+                      itemCount: cartItems.length,
+                      separatorBuilder: (context, index) => Divider(),
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> item = cartItems[index];
+                        double subtotalPerItem =
+                            item['price'] * item['quantity'];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(item['imageUrl']),
+                          ),
+                          title: Text(item['medicineName']),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Quantity: ${item['quantity']}'),
+                              Text(
+                                  'Price: RM${item['price'].toStringAsFixed(2)}'),
+                              Text(
+                                  'Subtotal: RM${subtotalPerItem.toStringAsFixed(2)}'),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-                    // Subtotal and Total Section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Payment',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8.0),
-                        Text('Subtotal: RM${subtotal.toStringAsFixed(2)}'),
-                        Text('Total: RM${total.toStringAsFixed(2)}'),
-                      ],
-                    ),
-                    SizedBox(height: 32.0),
-                    // Payment Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: Add payment processing logic here
-                        },
-                        child: Text('Pay RM${total.toStringAsFixed(2)}'),
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          backgroundColor: blueButton,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+            // Subtotal and Total Section
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Payment',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Text('Subtotal: RM${subtotal.toStringAsFixed(2)}'),
+                Text('Total: RM${total.toStringAsFixed(2)}'),
+              ],
+            ),
+            SizedBox(height: 32.0),
+            // Payment Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // TODO: Add payment processing logic here
+                },
+                child: Text('Pay RM${total.toStringAsFixed(2)}'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  backgroundColor: blueButton,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
-}
-
-class CartItem {
-  final String imageUrl;
-  final String medicineName;
-  final int quantity;
-  final double price;
-
-  CartItem({
-    required this.imageUrl,
-    required this.medicineName,
-    required this.quantity,
-    required this.price,
-  });
 }
