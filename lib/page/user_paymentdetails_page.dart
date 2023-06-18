@@ -300,12 +300,10 @@ class _UserCardDetailsPageState extends State<UserCardDetailsPage> {
 
   void _onValidate() {
     if (_formKey.currentState!.validate()) {
-      print('valid!');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Payment details validated successfully')),
       );
     } else {
-      print('invalid!');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Invalid payment details')),
       );
