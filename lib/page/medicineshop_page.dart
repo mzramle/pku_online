@@ -116,6 +116,65 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
     });
   }
 
+  Future<void> saveCartToFirestore() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      final userId = currentUser.uid;
+
+      final cartReference =
+          FirebaseFirestore.instance.collection('Cart').doc(userId);
+
+      final cartItemsReference = cartReference.collection('Items');
+
+      // Save the updated items in the cart
+      for (final medicine in cartItems) {
+        final quantity = cartQuantities[medicine.id] ?? 0;
+
+        // Fetch the medicine object from medicineListShop collection
+        final medicineSnapshot = await FirebaseFirestore.instance
+            .collection('medicineListShop')
+            .doc(medicine.id)
+            .get();
+
+        if (medicineSnapshot.exists) {
+          final medicineData = medicineSnapshot.data();
+
+          final itemQuerySnapshot = await cartItemsReference
+              .where('medicineId', isEqualTo: medicine.id)
+              .limit(1)
+              .get();
+
+          final itemData = {
+            'medicine': medicineData, // Save the fetched medicine object
+            'quantity': quantity,
+          };
+
+          if (itemQuerySnapshot.docs.isNotEmpty) {
+            final itemDoc = itemQuerySnapshot.docs.first;
+            await itemDoc.reference.update(itemData);
+          } else {
+            await cartItemsReference.doc(medicine.id).set(itemData);
+          }
+        }
+      }
+
+      // Delete items that are not in the cart
+      final existingItemsSnapshot = await cartItemsReference.get();
+      for (final doc in existingItemsSnapshot.docs) {
+        final medicineId = doc.id;
+        if (!cartItems.any((medicine) => medicine.id == medicineId)) {
+          await doc.reference.delete();
+        }
+      }
+
+      final cartData = {
+        'userId': userId,
+      };
+
+      await cartReference.set(cartData);
+    }
+  }
+
   void removeFromCart(MedicalPrescriptionModel medicine) {
     setState(() {
       cartItems.remove(medicine);
@@ -236,13 +295,15 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => CartPage(cartItems: cartItems),
                           ),
                         );
+
+                        await saveCartToFirestore(); // Save or update cart data immediately after pressing the button
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: blueButton,

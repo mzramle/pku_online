@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/models/medical_prescription_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pku_online/page/shopPayment_page.dart';
 
 class CartPage extends StatelessWidget {
   final List<MedicalPrescriptionModel> cartItems;
@@ -60,7 +63,7 @@ class CartPage extends StatelessWidget {
                   'Subtotal: \RM${medicineTotal.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 12.0,
-                    color: const Color.fromARGB(255, 148, 0, 0),
+                    color: blueButton,
                   ),
                 ),
               ],
@@ -82,17 +85,24 @@ class CartPage extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-                onPressed: () {
-                  // Implement the logic to proceed with the checkout
-                },
-                child: Text('Checkout'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: blueButton,
-                  padding: EdgeInsets.symmetric(horizontal: 32.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+              onPressed: () {
+                saveCartDataToFirestore();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PurchaseSummaryPage(),
                   ),
-                )),
+                );
+              },
+              child: Text('Checkout'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: blueButton,
+                padding: EdgeInsets.symmetric(horizontal: 32.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -110,7 +120,38 @@ class CartPage extends StatelessWidget {
     }
     return total;
   }
+
+  void saveCartDataToFirestore() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+
+      double subtotal = calculateTotal();
+      double total = subtotal;
+
+      CollectionReference cartCollection =
+          FirebaseFirestore.instance.collection('Cart');
+
+      // Check if the user's cart already exists
+      QuerySnapshot cartSnapshot = await cartCollection
+          .where('userId', isEqualTo: userId)
+          .limit(1)
+          .get();
+
+      if (cartSnapshot.docs.isNotEmpty) {
+        // Update the existing cart
+        String cartId = cartSnapshot.docs[0].id;
+        await cartCollection.doc(cartId).update({
+          'total': total,
+        });
+      } else {
+        // Create a new cart entry
+        await cartCollection.add({
+          'total': total,
+        });
+      }
+
+      // Implement the logic to proceed with the checkout
+    }
+  }
 }
-
-
-//'Total: \RM${medicineTotal.toStringAsFixed(2)}'
