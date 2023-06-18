@@ -138,6 +138,8 @@ class DetailBody extends StatelessWidget {
           _showTimeSelectionErrorSnackbar(context);
         }
       },
+      currentTime: DateTime.now(),
+      locale: LocaleType.en, // Set your desired locale
     );
   }
 
@@ -145,18 +147,39 @@ class DetailBody extends StatelessWidget {
     final TimeOfDay minTime = TimeOfDay(hour: 8, minute: 0);
     final TimeOfDay maxTime = TimeOfDay(hour: 17, minute: 0);
     final TimeOfDay selectedTime = TimeOfDay.fromDateTime(dateTime);
+    final now = TimeOfDay.fromDateTime(DateTime.now());
+
+    print('Selected time: $selectedTime');
+    print('Now: $now');
 
     if (selectedTime.hour >= minTime.hour &&
         selectedTime.hour <= maxTime.hour) {
-      return true;
+      if (dateTime.year == DateTime.now().year &&
+          dateTime.month == DateTime.now().month &&
+          dateTime.day == DateTime.now().day) {
+        if (selectedTime.hour > now.hour ||
+            (selectedTime.hour == now.hour &&
+                selectedTime.minute >= now.minute)) {
+          print('Time within range and not in the past');
+          return true;
+        } else {
+          print('Time is in the past');
+          return false;
+        }
+      } else {
+        print('Time within range');
+        return true;
+      }
     } else {
+      print('Time outside range');
       return false;
     }
   }
 
   void _showTimeSelectionErrorSnackbar(BuildContext context) {
     final snackBar = SnackBar(
-      content: Text('Please select a time between 8 AM and 5 PM.'),
+      content:
+          Text('The time you picked have passed or is out of the office hour.'),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -173,7 +196,8 @@ class DetailBody extends StatelessWidget {
         if (userSnapshot.exists) {
           Map<String, dynamic> userData = userSnapshot.data()!;
           FirebaseFirestore.instance.collection('Booking').add({
-            'dateTime': selectedDateTime,
+            'date': selectedDateTime
+                .toIso8601String(), // Store selected date as string
             'doctor': {
               'doctorName': doctor['doctorName'],
               'specialty': doctor['specialty'],

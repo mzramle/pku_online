@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/admin_page.dart';
@@ -11,6 +12,10 @@ import 'package:pku_online/page/doctor_detail.dart';
 import 'package:pku_online/page/medical_prescription_page.dart';
 import 'package:pku_online/page/medicineshop_page.dart';
 import 'package:pku_online/page/user_profile.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final User? user = _auth.currentUser;
+final String? currentUserId = user?.uid;
 
 List<Map> doctors = [
   {
@@ -236,33 +241,69 @@ class AppointmentCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage('assets/doctor01.jpeg'),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Dr.Muhammed Syahid',
-                                style: TextStyle(
-                                    color: white, fontWeight: FontWeight.w700)),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              'Dental Specialist',
-                              style: TextStyle(color: white),
-                            ),
-                          ],
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('Booking')
+                              .where('userUID', isEqualTo: currentUserId)
+                              .where('status', isEqualTo: 'Upcoming')
+                              .orderBy('dateTime')
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data != null) {
+                              final bookings = snapshot.data!.docs;
+                              if (bookings.isNotEmpty) {
+                                final upcomingBooking = bookings.first;
+                                final doctorData = upcomingBooking['doctor']
+                                    as Map<String, dynamic>?;
+                                if (doctorData != null) {
+                                  final imageUrl =
+                                      doctorData['imageUrl'] as String?;
+                                  final doctorName =
+                                      doctorData['doctorName'] as String?;
+                                  final specialty =
+                                      doctorData['specialty'] as String?;
+
+                                  return Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(imageUrl ?? ''),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            doctorName ?? '',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            specialty ?? '',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  );
+                                }
+                              }
+                            }
+
+                            // Placeholder widget or loading indicator when data is not available
+                            return CircularProgressIndicator();
+                          },
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
+                    SizedBox(height: 20),
                     ScheduleCard(),
                   ],
                 ),
@@ -327,9 +368,7 @@ class CategoryIcons extends StatelessWidget {
 }
 
 class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({
-    Key? key,
-  }) : super(key: key);
+  const ScheduleCard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -340,39 +379,86 @@ class ScheduleCard extends StatelessWidget {
       ),
       width: double.infinity,
       padding: EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Icon(
-            Icons.calendar_today,
-            color: blueButton,
-            size: 15,
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Text(
-            'Mon, July 29',
-            style: TextStyle(color: blueButton),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Icon(
-            Icons.access_alarm,
-            color: blueButton,
-            size: 17,
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Flexible(
-            child: Text(
-              '11:00 ~ 12:10',
-              style: TextStyle(color: blueButton),
-            ),
-          ),
-        ],
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Booking')
+            .where('userUID', isEqualTo: currentUserId)
+            .orderBy('dateTime')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            final bookings = snapshot.data!.docs;
+            if (bookings.isNotEmpty) {
+              QueryDocumentSnapshot? bookingWithClosestDateTime;
+              DateTime closestDateTime = DateTime.now()
+                  .add(Duration(days: 365)); // Initialize with a future date
+
+              // Find the booking with the closest dateTime to today
+              for (var booking in bookings) {
+                final bookingData = booking.data() as Map<String, dynamic>?;
+                if (bookingData != null) {
+                  final dateTime = bookingData['dateTime'] as Timestamp?;
+                  if (dateTime != null) {
+                    final bookingDateTime = dateTime.toDate();
+                    final timeDifference = bookingDateTime
+                        .difference(DateTime.now())
+                        .inMilliseconds;
+                    if (timeDifference >= 0 &&
+                        timeDifference <
+                            closestDateTime.millisecondsSinceEpoch) {
+                      closestDateTime = bookingDateTime;
+                      bookingWithClosestDateTime = booking;
+                    }
+                  }
+                }
+              }
+
+              if (bookingWithClosestDateTime != null) {
+                final dateTime =
+                    bookingWithClosestDateTime['dateTime'] as Timestamp?;
+                if (dateTime != null) {
+                  final bookingDateTime = dateTime.toDate();
+                  final formattedDate =
+                      DateFormat('EEE, MMM d').format(bookingDateTime);
+                  final formattedTime =
+                      DateFormat('HH:mm').format(bookingDateTime);
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        color: blueButton,
+                        size: 15,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        formattedDate,
+                        style: TextStyle(color: blueButton),
+                      ),
+                      SizedBox(width: 20),
+                      Icon(
+                        Icons.access_alarm,
+                        color: blueButton,
+                        size: 17,
+                      ),
+                      SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          formattedTime,
+                          style: TextStyle(color: blueButton),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              }
+            }
+          }
+
+          // Placeholder widget or loading indicator when data is not available
+          return CircularProgressIndicator();
+        },
       ),
     );
   }
