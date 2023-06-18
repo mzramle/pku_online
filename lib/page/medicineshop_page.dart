@@ -211,7 +211,7 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
           ],
         ),
       ),
-      floatingActionButton: currentUserRole == 'doctor'
+      floatingActionButton: currentUserRole == 'admin'
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
@@ -235,9 +235,6 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(
-                      Icons.shopping_cart,
-                    ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -249,15 +246,22 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: blueButton,
+                        elevation: 0.0,
                       ),
-                      child: Text('View Cart'),
+                      child: Row(
+                        children: [
+                          Icon(Icons.shopping_cart),
+                          SizedBox(width: 8.0),
+                          Text(
+                            'View Cart',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
                     ),
                     Text(
                       '${cartItems.length} Item(s)',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 16.0),
                     ),
                   ],
                 ),

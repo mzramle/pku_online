@@ -55,6 +55,7 @@ class MedicineDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 16.0),
             Text(
               'Category    : ${medicine.category}\n',
               style: textStyle,

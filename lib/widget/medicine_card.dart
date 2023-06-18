@@ -85,48 +85,45 @@ class MedicineCard extends StatelessWidget {
                         if (currentUserRole ==
                             'user') // Show only for user role
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                width: 32,
-                                height: 32,
+                                width: 28,
+                                height: 28,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Color.fromARGB(255, 180, 75, 0),
+                                  color: Colors.grey.withOpacity(0.2),
                                 ),
                                 child: IconButton(
                                   onPressed: onRemoveFromCart,
                                   icon: Icon(Icons.remove),
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   padding: EdgeInsets.zero,
+                                  iconSize: 16,
                                 ),
                               ),
+                              SizedBox(width: 8.0),
+                              Text(
+                                medCardQuantity.toString(),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 8.0),
                               Container(
-                                width: 32,
-                                height: 32,
+                                width: 28,
+                                height: 28,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.green,
+                                  color: Colors.grey.withOpacity(0.2),
                                 ),
                                 child: IconButton(
                                   onPressed: onAddToCart,
                                   icon: Icon(Icons.add),
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   padding: EdgeInsets.zero,
-                                ),
-                              ),
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color.fromARGB(255, 122, 0, 0),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "x$medCardQuantity",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                  iconSize: 16,
                                 ),
                               ),
                             ],

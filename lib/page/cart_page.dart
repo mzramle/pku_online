@@ -51,13 +51,13 @@ class CartPage extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text('\RM${medicine.price.toStringAsFixed(2)} '),
                     Text('x$medQuantity\t'),
-                    Text('\RM${medicine.price.toStringAsFixed(2)}'),
                     SizedBox(width: 4.0),
                   ],
                 ),
                 Text(
-                  'Total: \RM${medicineTotal.toStringAsFixed(2)}',
+                  'Subtotal: \RM${medicineTotal.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 12.0,
                     color: const Color.fromARGB(255, 148, 0, 0),
