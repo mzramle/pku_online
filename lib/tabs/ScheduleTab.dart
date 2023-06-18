@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pku_online/core/colors.dart';
 import 'package:pku_online/core/text_style.dart';
 import 'package:pku_online/page/chat_page.dart';
+import 'package:pku_online/page/paymentpage.dart';
 
 class ScheduleTab extends StatefulWidget {
   const ScheduleTab({Key? key}) : super(key: key);
@@ -513,7 +514,16 @@ class _ScheduleTabState extends State<ScheduleTab> {
   }
 
   void navigateToPaymentPage(Booking booking) {
-    // TODO: Navigate to the payment page and pass the booking information along with the doctor object
+    // Set the price to 5
+    double price = 5.0;
+
+    // Navigate to the payment page and pass the booking information and price
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentPage(booking: booking, price: price),
+      ),
+    );
   }
 
   void navigateToChatPage(Booking booking) {

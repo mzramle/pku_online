@@ -211,7 +211,7 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
           ],
         ),
       ),
-      floatingActionButton: currentUserRole == 'admin'
+      floatingActionButton: currentUserRole == 'doctor'
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
@@ -226,18 +226,7 @@ class _MedicineShopPageState extends State<MedicineShopPage> {
               child: Icon(Icons.add),
               backgroundColor: blueButton,
             )
-          : currentUserRole == 'user'
-              ? FloatingActionButton(
-                  onPressed: () {
-                    setState(() {
-                      cartItems.clear();
-                      cartQuantities.clear();
-                    });
-                  },
-                  child: Icon(Icons.clear_all_rounded),
-                  backgroundColor: Colors.red,
-                )
-              : null,
+          : null,
       bottomNavigationBar: currentUserRole == 'user'
           ? BottomAppBar(
               child: Container(

@@ -6,8 +6,10 @@ class MedicineDetailsPage extends StatelessWidget {
   final MedicalPrescriptionModel medicine;
   final String currentUserRole;
 
-  const MedicineDetailsPage(
-      {required this.medicine, required this.currentUserRole});
+  const MedicineDetailsPage({
+    required this.medicine,
+    required this.currentUserRole,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,11 @@ class MedicineDetailsPage extends StatelessWidget {
                         builder: (context) =>
                             UpdateMedicinePage(medicine: medicine),
                       ),
-                    );
+                    ).then((_) {
+                      // Handle the update or refresh logic here
+                      // For example, you can fetch the updated medicine details
+                      // from the server and update the UI accordingly
+                    });
                   },
                   icon: Icon(Icons.edit),
                 ),
