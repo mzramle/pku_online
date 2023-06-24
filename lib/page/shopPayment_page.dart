@@ -1,9 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pku_online/controller/cart_controller.dart';
 import 'package:pku_online/core/colors.dart';
+import 'package:pku_online/models/cart_item_model.dart';
+import 'package:pku_online/page/medicineshop_page.dart';
+import 'package:pku_online/tabs/ScheduleTab.dart';
 
 class PurchaseSummaryPage extends StatefulWidget {
+  final Map<String, dynamic> doctor;
+  PurchaseSummaryPage(
+      {required this.doctor}); // Constructor with doctor parameter
   @override
   _PurchaseSummaryPageState createState() => _PurchaseSummaryPageState();
 }
@@ -12,11 +20,15 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
   double subtotal = 0.0;
   double total = 0.0;
+
+  late CartController _cartController;
+
   List<Map<String, dynamic>> cartItems = [];
 
   @override
   void initState() {
     super.initState();
+    _cartController = CartController(cartModel: CartModel());
     _fetchCartItems();
   }
 
@@ -29,11 +41,33 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
 
       if (cartSnapshot.exists) {
         var cartData = cartSnapshot.data();
+        List<dynamic> items = cartData?['items'] ?? [];
+        double tempTotal = 0.0;
 
-        double tempTotal = cartData?['total'] ?? 0.0;
+        // Calculate the subtotal and total based on the cart items
+        List<Map<String, dynamic>> tempCartItems = [];
+
+        items.forEach((item) {
+          String? medicineName = item['medicineName'];
+          int quantity = item['quantity'];
+          double price = item['price'];
+          double subtotal = CartController(cartModel: CartModel())
+              .calculateMedicineTotal(price, quantity);
+
+          tempCartItems.add({
+            'medicineName': medicineName,
+            'quantity': quantity,
+            'price': price,
+            'subtotal': subtotal,
+          });
+
+          tempTotal += subtotal;
+        });
 
         setState(() {
-          total = tempTotal;
+          cartItems = tempCartItems;
+          subtotal = tempTotal;
+          total = subtotal; // Assign subtotal to total
         });
       }
     } catch (error) {
@@ -42,22 +76,64 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
     }
   }
 
-  void _clearCartItems() async {
+  void _processPayment() async {
     try {
-      await FirebaseFirestore.instance
-          .collection('Cart')
-          .doc(currentUserId)
-          .collection('Items')
-          .get()
-          .then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          doc.reference.delete();
-        });
+      // Save invoice to Firestore
+      await FirebaseFirestore.instance.collection('Invoice').add({
+        'userId': currentUserId,
+        'purchaseSummary': cartItems,
+        'subtotal': subtotal,
+        'total': total,
+        'timestamp': DateTime.now(),
       });
 
-      print('Cart items cleared successfully.');
+      // Clear cart items
+      await _clearCartItems();
+
+      // Show success message
+      Fluttertoast.showToast(
+        msg: 'Payment is successful!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+
+      // Navigate back to MedicineShopPage
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MedicineShopPage(),
+        ),
+      );
+    } catch (error) {
+      print('Error processing payment: $error');
+      // Show error message
+      Fluttertoast.showToast(
+        msg: 'Payment processing failed. Please try again.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _clearCartItems() async {
+    try {
+      final cartRef = FirebaseFirestore.instance
+          .collection('Cart')
+          .doc(currentUserId)
+          .collection('Items');
+
+      final cartItems = await cartRef.get();
+
+      for (final doc in cartItems.docs) {
+        await doc.reference.delete();
+      }
     } catch (error) {
       print('Error clearing cart items: $error');
+      throw error;
     }
   }
 
@@ -178,7 +254,7 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
               ),
             ),
 
-            // Subtotal and Total Section
+// Subtotal and Total Section
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -190,7 +266,6 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
                   ),
                 ),
                 SizedBox(height: 8.0),
-                //    Text('Subtotal: RM${subtotal.toStringAsFixed(2)}'),
                 Text('Total: RM${total.toStringAsFixed(2)}'),
               ],
             ),
@@ -199,9 +274,7 @@ class _PurchaseSummaryPageState extends State<PurchaseSummaryPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Add payment processing logic here
-                },
+                onPressed: _processPayment, // Call the _processPayment method
                 child: Text('Pay RM${total.toStringAsFixed(2)}'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16.0),

@@ -21,11 +21,7 @@ class CartController {
   }
 
   double calculateTotal() {
-    double total = 0;
-    for (var item in cartModel.cartItems) {
-      total += item.price;
-    }
-    return total;
+    return cartModel.totalPrice;
   }
 
   double calculateMedicineTotal(double price, int quantity) {

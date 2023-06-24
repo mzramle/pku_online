@@ -6,9 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pku_online/page/shopPayment_page.dart';
 
 class CartPage extends StatelessWidget {
+  final Map<String, dynamic> doctor;
+
   final List<MedicalPrescriptionModel> cartItems;
 
-  CartPage({required this.cartItems});
+  CartPage({required this.cartItems, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +92,7 @@ class CartPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PurchaseSummaryPage(),
+                    builder: (context) => PurchaseSummaryPage(doctor: doctor),
                   ),
                 );
               },

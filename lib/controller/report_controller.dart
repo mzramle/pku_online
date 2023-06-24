@@ -5,15 +5,14 @@ import 'package:pku_online/models/report_model.dart';
 class ReportController {
   late ReportModel _reportData;
 
-  ReportController() {
-    _reportData = ReportModel(
-      bmi: '',
-      bmiResultText: '',
-      weight: 0,
-      height: 0,
-      latestReports: [],
-    );
-  }
+  ReportController()
+      : _reportData = ReportModel(
+          bmi: '',
+          bmiResultText: '',
+          weight: 0,
+          height: 0,
+          latestReports: [],
+        );
 
   ReportModel get model => _reportData;
 
@@ -21,24 +20,48 @@ class ReportController {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     try {
-      final userData = await FirebaseFirestore.instance
-          .collection('userBMIResult')
-          .doc(currentUserId)
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('Invoice')
+          .where('userId', isEqualTo: currentUserId)
+          .orderBy('timestamp', descending: true)
+          .limit(10)
           .get();
 
-      if (userData.exists) {
-        final data = userData.data() as Map<String, dynamic>;
+      final latestReports =
+          querySnapshot.docs.map((doc) => doc['report']).toList();
+      _reportData.latestReports = latestReports.cast<String>();
+    } catch (e) {
+      print('Error fetching latest reports: $e');
+    }
+  }
 
-        _reportData = ReportModel(
-          bmi: data['bmi'] ?? '',
-          bmiResultText: data['resultText'] ?? '',
-          weight: data['weight']?.toDouble() ?? 0,
-          height: data['height']?.toDouble() ?? 0,
-          latestReports: List<String>.from(data['latestReports'] ?? []),
-        );
+  Future<void> fetchLatestReports(String currentUserId) async {
+    try {
+      final invoiceSnapshot = await FirebaseFirestore.instance
+          .collection('Invoice')
+          .where('userId', isEqualTo: currentUserId)
+          .orderBy('timestamp', descending: true)
+          .limit(5)
+          .get();
+
+      if (invoiceSnapshot.docs.isNotEmpty) {
+        final latestInvoices = invoiceSnapshot.docs.map((doc) {
+          final invoiceData = doc.data();
+          return invoiceData['purchaseSummary'] as List<dynamic>;
+        }).toList();
+
+        latestInvoices.forEach((invoice) {
+          final List<Map<String, dynamic>> invoiceItems =
+              List<Map<String, dynamic>>.from(invoice);
+
+          invoiceItems.forEach((item) {
+            final String medicineName = item['medicineName'] as String;
+            _reportData.latestReports.add(medicineName);
+          });
+        });
       }
     } catch (e) {
-      print('Error fetching user data: $e');
+      print('Error fetching latest reports: $e');
     }
   }
 

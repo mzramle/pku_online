@@ -5,7 +5,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:pku_online/core/colors.dart';
 import "package:latlong2/latlong.dart" as latLng;
+import 'package:pku_online/tabs/HomeTab.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:pku_online/page/shopPayment_page.dart';
+import 'package:pku_online/models/cart_item_model.dart';
+import 'package:pku_online/controller/cart_controller.dart';
 
 class SliverDoctorDetail extends StatelessWidget {
   final Map<String, dynamic> doctor;
@@ -45,7 +49,7 @@ class DetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final about = doctor['about'];
+    final about = doctor['about'] ?? '';
 
     return Container(
       padding: EdgeInsets.all(20),
@@ -186,74 +190,54 @@ class DetailBody extends StatelessWidget {
 
   void _handleAppointmentBooking(
       BuildContext context, DateTime selectedDateTime) {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      FirebaseFirestore.instance
-          .collection('User')
-          .doc(user.uid)
-          .get()
-          .then((userSnapshot) {
-        if (userSnapshot.exists) {
-          Map<String, dynamic> userData = userSnapshot.data()!;
-          FirebaseFirestore.instance.collection('Booking').add({
-            'date': selectedDateTime
-                .toIso8601String(), // Store selected date as string
-            'doctor': {
-              'doctorName': doctor['doctorName'],
-              'specialty': doctor['specialty'],
-              'email': doctor['email'],
-              'imageUrl': doctor['imageUrl'],
-            },
-            'user': userData, // Save the entire user object
-            'userUID': user.uid,
-            'doctorUID': doctor['doctorId'],
-            'status': 'Upcoming',
-          }).then((value) {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text('Success'),
-                  content: Text('Booking created successfully.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('OK'),
+    FirebaseFirestore.instance.collection('Booking').add({
+      'doctorId': currentUserId,
+      'userId': currentUserId,
+      'dateTime': selectedDateTime,
+    }).then((value) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Success'),
+            content: Text('Booking created successfully.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PurchaseSummaryPage(doctor: doctor),
                     ),
-                  ],
-                );
-              },
-            );
-            print('Booking saved to the database');
-          }).catchError((error) {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text('Error'),
-                  content: Text('Failed to save booking: $error'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('OK'),
-                    ),
-                  ],
-                );
-              },
-            );
-            print('Failed to save booking: $error');
-          });
-        } else {
-          print('User does not exist');
-        }
-      }).catchError((error) {
-        print('Failed to fetch user: $error');
-      });
-    }
+                  );
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      print('Booking saved to the database');
+    }).catchError((error) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to save booking: $error'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 }
 
@@ -440,9 +424,9 @@ class DetailDoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = doctor['doctorName'];
-    final specialty = doctor['specialty'];
-    final imageUrl = doctor['imageUrl'];
+    final name = doctor['doctorName'] ?? '';
+    final specialty = doctor['specialty'] ?? '';
+    final imageUrl = doctor['imageUrl'] ?? '';
     return Container(
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
